@@ -242,9 +242,9 @@ const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
                     <th className="p-3 text-left font-bold text-gray-600">#</th>
                     <th className="p-3 text-left font-bold text-gray-600">Aluno</th>
                     <th className="p-3 text-center font-bold text-gray-600">P. Paraná</th>
-                    <th className="p-3 text-center font-bold text-gray-600">SAEB</th>
-                    <th className="p-3 text-center font-bold text-gray-600">Internas</th>
-                    <th className="p-3 text-center font-bold text-gray-600">Externas</th>
+                    <th className="p-3 text-center font-bold text-gray-600">Prova Acerta Brasil</th>
+                    <th className="p-3 text-center font-bold text-gray-600">Rec.Ap.Português</th>
+                    <th className="p-3 text-center font-bold text-gray-600">Rec.Ap.Matematica</th>
                     <th className="p-3 text-center font-bold text-gray-600">Plataformas</th>
                     <th className="p-3 text-center font-bold text-gray-600">Frequência</th>
                     <th className="p-3 text-center font-bold text-emerald-700">Média</th>

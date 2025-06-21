@@ -52,9 +52,9 @@ const StudentReportPage = ({ student, onClose }) => {
 
   const performanceData = [
     { label: "Prova Paraná", value: stats.provaParana, icon: BarChartHorizontal, color: "border-blue-500", trend: stats.provaParanaTrend },
-    { label: "SAEB", value: stats.saeb, icon: BarChartHorizontal, color: "border-green-500", trend: stats.saebTrend },
-    { label: "Provas Internas", value: stats.provasInternas, icon: BarChartHorizontal, color: "border-yellow-500", trend: stats.internasTrend },
-    { label: "Provas Externas", value: stats.provasExternas, icon: BarChartHorizontal, color: "border-purple-500", trend: stats.externasTrend },
+    { label: "Prova Acerta Brasil", value: stats.saeb, icon: BarChartHorizontal, color: "border-green-500", trend: stats.saebTrend },
+    { label: "Rec.Ap.Português", value: stats.provasInternas, icon: BarChartHorizontal, color: "border-yellow-500", trend: stats.internasTrend },
+    { label: "Rec.Ap.Matematica", value: stats.provasExternas, icon: BarChartHorizontal, color: "border-purple-500", trend: stats.externasTrend },
     { label: "Frequência", value: stats.frequencia, icon: Users, color: "border-pink-500", trend: stats.frequenciaTrend },
     { label: "Plataformas Digitais", value: stats.plataformasDigitais, icon: PieChart, color: "border-orange-500", trend: stats.plataformasDigitaisTrend },
   ];

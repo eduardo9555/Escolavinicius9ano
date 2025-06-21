@@ -40,9 +40,9 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
           <tr>
             <TableHeader label="Aluno" sortKey="name" onSort={onSort} sortIcon={getSortIcon('name')} />
             <TableHeader label="Prova Paraná" sortKey="provaParana" onSort={onSort} sortIcon={getSortIcon('provaParana')} />
-            <TableHeader label="SAEB" sortKey="saeb" onSort={onSort} sortIcon={getSortIcon('saeb')} />
-            <TableHeader label="Internas" sortKey="provasInternas" onSort={onSort} sortIcon={getSortIcon('provasInternas')} />
-            <TableHeader label="Externas" sortKey="provasExternas" onSort={onSort} sortIcon={getSortIcon('provasExternas')} />
+            <TableHeader label="Prova Acerta Brasil" sortKey="saeb" onSort={onSort} sortIcon={getSortIcon('saeb')} />
+            <TableHeader label="Rec.Ap.Português" sortKey="provasInternas" onSort={onSort} sortIcon={getSortIcon('provasInternas')} />
+            <TableHeader label="Rec.Ap.Matematica" sortKey="provasExternas" onSort={onSort} sortIcon={getSortIcon('provasExternas')} />
             <TableHeader label="Frequência" sortKey="frequencia" onSort={onSort} sortIcon={getSortIcon('frequencia')} />
             <TableHeader label="Plataformas" sortKey="plataformasDigitais" onSort={onSort} sortIcon={getSortIcon('plataformasDigitais')} />
             <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Média</th>

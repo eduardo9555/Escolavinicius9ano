@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Trophy, Medal, Award, Users, Calendar, TrendingUp, BarChart3, PieChart, ThumbsUp, AlertTriangle, MessageSquare, Sparkles, ArrowRight, Newspaper, CalendarDays, BookOpen } from 'lucide-react';
+import { Trophy, Medal, Award, Users, Calendar, TrendingUp, BarChart3, PieChart, ThumbsUp, AlertTriangle, MessageSquare, Sparkles, ArrowRight, Newspaper, CalendarDays, BookOpen, ExternalLink, Star } from 'lucide-react';
 import AdminDashboard from '@/components/AdminDashboard';
 
 const MotivationalMessage = ({ score, name }) => {
@@ -132,6 +132,44 @@ const MascotPrize = ({ userName, userRanking }) => {
   );
 };
 
+const FeedbackSection = () => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1.2, duration: 0.6, ease: "easeOut" }}
+      className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-xl shadow-xl text-white card-hover"
+    >
+      <div className="flex items-center space-x-3 mb-4">
+        <motion.div
+          className="p-2 bg-white/20 rounded-full"
+          animate={{ rotate: [0, 5, -5, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Star className="w-6 h-6 text-yellow-300" />
+        </motion.div>
+        <h3 className="text-xl font-bold">Participe do Desenvolvimento da Nossa Escola</h3>
+      </div>
+      <p className="text-blue-100 text-sm mb-4 leading-relaxed">
+        Avalie sua experiência conosco e deixe aqui sua sugestão de melhoria. Sua opinião é muito importante para nós!
+      </p>
+      <Button
+        asChild
+        className="w-full bg-white/20 border-white/30 hover:bg-white/30 text-white backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
+      >
+        <a
+          href="https://docs.google.com/forms/d/e/1FAIpQLSeHytzhO-f4sx4kNLmGDV7pvexrnNkr2YoevrG8nvF18EZ7ow/viewform?usp=dialog"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center"
+        >
+          <ExternalLink className="w-4 h-4 mr-2" />
+          Avaliar e Sugerir Melhorias
+        </a>
+      </Button>
+    </motion.div>
+  );
+};
 
 const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents }) => {
   const [studentData, setStudentData] = useState(user);
@@ -161,12 +199,11 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
     ) / 5
   ) : 0;
 
-
   const performanceItems = [
-    { label: 'Provas Externas', value: studentData?.stats?.provasExternas || 0, color: 'bg-gradient-to-r from-purple-500 to-indigo-600', icon: <BookOpen /> },
-    { label: 'Provas Internas', value: studentData?.stats?.provasInternas || 0, color: 'bg-gradient-to-r from-sky-500 to-blue-600', icon: <Award /> },
+    { label: 'Rec.Ap.Matematica', value: studentData?.stats?.provasExternas || 0, color: 'bg-gradient-to-r from-purple-500 to-indigo-600', icon: <BookOpen /> },
+    { label: 'Rec.Ap.Português', value: studentData?.stats?.provasInternas || 0, color: 'bg-gradient-to-r from-sky-500 to-blue-600', icon: <Award /> },
     { label: 'Prova Paraná', value: studentData?.stats?.provaParana || 0, color: 'bg-gradient-to-r from-teal-500 to-cyan-600', icon: <Medal /> },
-    { label: 'SAEB', value: studentData?.stats?.saeb || 0, color: 'bg-gradient-to-r from-emerald-500 to-green-600', icon: <Trophy /> },
+    { label: 'Prova Acerta Brasil', value: studentData?.stats?.saeb || 0, color: 'bg-gradient-to-r from-emerald-500 to-green-600', icon: <Trophy /> },
     { label: 'Plataformas Digitais', value: studentData?.stats?.plataformasDigitais || 0, color: 'bg-gradient-to-r from-amber-500 to-orange-600', icon: <PieChart /> }
   ];
 
@@ -331,6 +368,9 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
           </Button>
         </motion.div>
       </motion.div>
+
+      <FeedbackSection />
+
       <style jsx>{`
         .progress-bar-animated {
           position: relative;

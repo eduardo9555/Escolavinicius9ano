@@ -192,9 +192,9 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
         </div>
                 
         <InputField label="Prova Paraná (%)" id="provaParana" type="number" min="0" max="100" value={formData.provaParana} onChange={handleChange} icon={<Percent />} />
-        <InputField label="SAEB (%)" id="saeb" type="number" min="0" max="100" value={formData.saeb} onChange={handleChange} icon={<Percent />} />
-        <InputField label="Provas Internas (%)" id="provasInternas" type="number" min="0" max="100" value={formData.provasInternas} onChange={handleChange} icon={<Percent />} />
-        <InputField label="Provas Externas (%)" id="provasExternas" type="number" min="0" max="100" value={formData.provasExternas} onChange={handleChange} icon={<Percent />} />
+        <InputField label="Prova Acerta Brasil (%)" id="saeb" type="number" min="0" max="100" value={formData.saeb} onChange={handleChange} icon={<Percent />} />
+        <InputField label="Rec.Ap.Português (%)" id="provasInternas" type="number" min="0" max="100" value={formData.provasInternas} onChange={handleChange} icon={<Percent />} />
+        <InputField label="Rec.Ap.Matematica (%)" id="provasExternas" type="number" min="0" max="100" value={formData.provasExternas} onChange={handleChange} icon={<Percent />} />
         <InputField label="Frequência (%)" id="frequencia" type="number" min="0" max="100" value={formData.frequencia} onChange={handleChange} icon={<BarChart />} />
         <InputField label="Plataformas Digitais (%)" id="plataformasDigitais" type="number" min="0" max="100" value={formData.plataformasDigitais} onChange={handleChange} icon={<Activity />} />
         
