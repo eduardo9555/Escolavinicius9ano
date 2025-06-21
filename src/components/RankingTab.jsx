@@ -14,10 +14,13 @@ const RankingTab = ({ user, allStudents = [] }) => {
         stats.provasExternas || 0,
         stats.plataformasDigitais || 0,
       ];
-      const averageScore = scores.reduce((sum, score) => sum + score, 0) / (scores.filter(s => typeof s === 'number').length || 1);
+      const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
+      const averageScore = validScores.length > 0 ? 
+        Math.round(scores.reduce((sum, score) => sum + (Number(score) || 0), 0) / validScores.length) : 0;
+      
       return {
         ...student,
-        averageScore: Math.round(averageScore),
+        averageScore,
         trend: ['up', 'down', 'stable'][Math.floor(Math.random() * 3)], 
       };
     })
@@ -28,7 +31,6 @@ const RankingTab = ({ user, allStudents = [] }) => {
       // If average scores are the same, sort by name alphabetically
       return a.name.localeCompare(b.name);
     });
-
 
   const getMedalColor = (position) => {
     if (position === 1) return "text-yellow-400";
@@ -44,7 +46,6 @@ const RankingTab = ({ user, allStudents = [] }) => {
     return "bg-gray-100";
   };
 
-
   const getPodiumHeight = (position) => {
     if (position === 1) return "h-48"; 
     if (position === 2) return "h-40"; 
@@ -57,6 +58,11 @@ const RankingTab = ({ user, allStudents = [] }) => {
     if (trend === 'down') return <TrendingDown className="w-5 h-5 text-red-500" />;
     return <CheckCircle className="w-5 h-5 text-gray-400" />;
   };
+
+  // Debug: Log the data to console
+  console.log('RankingTab - User:', user);
+  console.log('RankingTab - AllStudents:', allStudents);
+  console.log('RankingTab - RankedStudents:', rankedStudentsToDisplay);
 
   return (
     <div className="space-y-8 p-4 md:p-6 bg-gradient-to-br from-slate-100 via-gray-100 to-stone-100 rounded-xl shadow-inner min-h-[calc(100vh-10rem)]">
@@ -73,6 +79,18 @@ const RankingTab = ({ user, allStudents = [] }) => {
         </p>
       </motion.div>
 
+      {rankedStudentsToDisplay.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center py-12 bg-white rounded-xl shadow-lg"
+        >
+          <Trophy className="w-20 h-20 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-500 mb-2">Nenhum dado de ranking disponível</h3>
+          <p className="text-gray-400">Os dados dos alunos ainda estão sendo carregados ou não há alunos cadastrados.</p>
+        </motion.div>
+      )}
+
       {rankedStudentsToDisplay.length >= 3 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -87,7 +105,7 @@ const RankingTab = ({ user, allStudents = [] }) => {
           
           <div className="flex flex-col sm:flex-row justify-around items-end space-y-6 sm:space-y-0 sm:space-x-4 relative z-10">
             {[rankedStudentsToDisplay[1], rankedStudentsToDisplay[0], rankedStudentsToDisplay[2]].map((student, index) => {
-              if (!student) return null; // Add this check
+              if (!student) return null;
               const originalIndex = student === rankedStudentsToDisplay[0] ? 0 : student === rankedStudentsToDisplay[1] ? 1 : 2;
               const position = originalIndex + 1;
               return (
@@ -122,70 +140,70 @@ const RankingTab = ({ user, allStudents = [] }) => {
         </motion.div>
       )}
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: rankedStudentsToDisplay.length >=3 ? 0.3 : 0.1 }}
-        className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200"
-      >
-        <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white p-5">
-          <h3 className="text-xl font-bold tracking-wide">Classificação Completa</h3>
-        </div>
-        
-        <div className="divide-y divide-gray-200">
-          {rankedStudentsToDisplay.map((student, index) => (
-            <motion.div
-              key={student.id}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.3, delay: index * 0.04, ease: "circOut" }}
-              className={`p-4 sm:p-5 flex items-center justify-between transition-colors duration-200 card-hover ${
-                user && student.id === user.uid ? 'bg-emerald-50 border-l-4 border-emerald-500' : 'hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${getMedalClass(index + 1)} ${index < 3 ? getMedalColor(index+1) : 'text-gray-700'}`}>
-                  {index < 3 ? 
-                   (index === 0 ? <Trophy className="w-6 h-6" /> : index === 1 ? <Medal className="w-6 h-6" /> : <Award className="w-6 h-6" />)
-                   : `#${index + 1}`}
+      {rankedStudentsToDisplay.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: rankedStudentsToDisplay.length >= 3 ? 0.3 : 0.1 }}
+          className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200"
+        >
+          <div className="bg-gradient-to-r from-emerald-500 to-green-600 text-white p-5">
+            <h3 className="text-xl font-bold tracking-wide">Classificação Completa</h3>
+            <p className="text-sm text-emerald-100 mt-1">Total de {rankedStudentsToDisplay.length} alunos</p>
+          </div>
+          
+          <div className="divide-y divide-gray-200">
+            {rankedStudentsToDisplay.map((student, index) => (
+              <motion.div
+                key={student.id}
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.3, delay: index * 0.04, ease: "circOut" }}
+                className={`p-4 sm:p-5 flex items-center justify-between transition-colors duration-200 card-hover ${
+                  user && (student.id === user.uid || student.email === user.email) ? 'bg-emerald-50 border-l-4 border-emerald-500' : 'hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center space-x-3 sm:space-x-4">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${getMedalClass(index + 1)} ${index < 3 ? getMedalColor(index+1) : 'text-gray-700'}`}>
+                    {index < 3 ? 
+                     (index === 0 ? <Trophy className="w-6 h-6" /> : index === 1 ? <Medal className="w-6 h-6" /> : <Award className="w-6 h-6" />)
+                     : `#${index + 1}`}
+                  </div>
+                  
+                  <img 
+                    src={student.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${student.name}`}
+                    alt={student.name}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gray-200 object-cover shadow-sm"
+                  />
+                  
+                  <div>
+                    <p className="font-semibold text-gray-800 text-sm sm:text-base flex items-center">
+                      {student.name}
+                      {user && (student.id === user.uid || student.email === user.email) && (
+                        <span className="ml-2 bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-medium">
+                          Você
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-gray-500 text-xs sm:text-sm">Posição #{index + 1}</p>
+                  </div>
                 </div>
                 
-                <img 
-                  src={student.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${student.name}`}
-                  alt={student.name}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gray-200 object-cover shadow-sm"
-                />
-                
-                <div>
-                  <p className="font-semibold text-gray-800 text-sm sm:text-base flex items-center">
-                    {student.name}
-                    {user && student.id === user.uid && (
-                      <span className="ml-2 bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-medium">
-                        Você
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-gray-500 text-xs sm:text-sm">Posição #{index + 1}</p>
+                <div className="flex items-center space-x-3 sm:space-x-4">
+                  <div className="text-right">
+                    <p className="text-lg sm:text-xl font-bold text-emerald-600">{student.averageScore}%</p>
+                    <p className="text-gray-500 text-xs sm:text-sm">Média</p>
+                  </div>
+                  
+                  <div className="hidden sm:flex items-center" title={`Tendência: ${student.trend}`}>
+                    {getTrendIcon(student.trend)}
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 sm:space-x-4">
-                <div className="text-right">
-                  <p className="text-lg sm:text-xl font-bold text-emerald-600">{student.averageScore}%</p>
-                  <p className="text-gray-500 text-xs sm:text-sm">Média</p>
-                </div>
-                
-                <div className="hidden sm:flex items-center" title={`Tendência: ${student.trend}`}>
-                  {getTrendIcon(student.trend)}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-          {rankedStudentsToDisplay.length === 0 && (
-            <p className="p-6 text-center text-gray-500">Nenhum aluno no ranking ainda.</p>
-          )}
-        </div>
-      </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, scale:0.95 }}

@@ -42,13 +42,17 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
     }
   }, [user.type]);
 
-
   const renderContent = () => {
+    console.log('Dashboard - renderContent - activeTab:', activeTab);
+    console.log('Dashboard - renderContent - user:', user);
+    console.log('Dashboard - renderContent - allStudents:', allStudents);
+    
     switch (activeTab) {
       case 'dashboard':
         return <DashboardContent user={user} setActiveTab={setActiveTab} allStudents={allStudents} allNews={allNews} allEvents={allEvents} />;
       case 'ranking':
-        return user.type === 'student' ? <RankingTab user={user} allStudents={allStudents} /> : null; 
+        console.log('Rendering RankingTab for student with allStudents:', allStudents);
+        return <RankingTab user={user} allStudents={allStudents} />; 
       case 'news':
         return <AdminNewsPanel user={user} isStudentView={user.type === 'student'} />;
       case 'events':
@@ -60,6 +64,7 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
       case 'adminEvents':
          return user.type === 'admin' ? <AdminEventsPanel user={user} isStudentView={false} /> : null;
       case 'adminRanking':
+        console.log('Rendering RankingTab for admin with allStudents:', allStudents);
         return user.type === 'admin' ? <RankingTab user={user} allStudents={allStudents} /> : null;
       case 'adminReports':
         return user.type === 'admin' ? <AdminReportsPanel allStudents={allStudents} allNews={allNews} allEvents={allEvents} /> : null;
