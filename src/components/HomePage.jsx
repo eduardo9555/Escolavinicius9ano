@@ -17,6 +17,15 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
     return new Date(timestamp.toDate()).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
   };
 
+  const formatEventDate = (dateString) => {
+    if (!dateString) return 'Data indisponível';
+    try {
+      return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+    } catch (error) {
+      return 'Data indisponível';
+    }
+  };
+
   return (
     <div className="min-h-screen gradient-bg relative overflow-hidden flex flex-col">
       <div className="absolute inset-0 overflow-hidden">
@@ -197,7 +206,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                         whileHover={{ scale: 1.02 }}
                       >
                         <h4 className="font-semibold text-white text-base truncate">{news.title}</h4>
-                        <p className="text-sm text-white/80 truncate">{news.summary}</p>
+                        <p className="text-sm text-white/80 line-clamp-2">{news.summary}</p>
                         <div className="text-xs text-white/70 mt-1">{formatDate(news.createdAt)}</div>
                       </motion.div>
                     ))}
@@ -218,7 +227,9 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                       >
                         <h4 className="font-semibold text-white text-base truncate">{event.title}</h4>
                         <p className="text-sm text-white/80 truncate">{event.location}</p>
-                        <div className="text-xs text-white/70 mt-1">{new Date(event.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })} às {event.time}</div>
+                        <div className="text-xs text-white/70 mt-1">
+                          {formatEventDate(event.date)} às {event.time}
+                        </div>
                       </motion.div>
                     ))}
                   </div>

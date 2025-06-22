@@ -37,7 +37,7 @@ function App() {
     'hemily.silva.costa@escola.pr.gov.br',
     'hiuriqui.santos@escola.pr.gov.br',
     'costa.silva.isabella@escola.pr.gov.br',
-    'jordana.alves@escola.pr.gov.br',
+    'jhordana.alves@escola.pr.gov.br',
     'santos.silva.jose2712@escola.pr.gov.br',
     'ketlyn.coelho.nascimento@escola.pr.gov.br',
     'lucas.pigentini.ventura@escola.pr.gov.br',

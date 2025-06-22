@@ -2,64 +2,64 @@ import React from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { motion } from 'framer-motion';
-import { FileText, Users, BarChartHorizontal } from 'lucide-react';
+import { Users, BarChartHorizontal, TrendingUp, BookOpen } from 'lucide-react';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
-const ReportCharts = ({ students, activities, isLoading }) => {
+const ReportCharts = ({ students, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="mt-10 p-6 bg-slate-50 rounded-lg border border-dashed border-slate-300 text-center print:hidden">
+      <div className="mt-10 p-8 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border border-dashed border-slate-300 text-center print:hidden shadow-lg">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 text-slate-400 mx-auto mb-3"
+          className="w-16 h-16 text-slate-400 mx-auto mb-4"
         >
             <Users/>
         </motion.div>
-        <p className="text-slate-500 font-medium">Carregando gráficos e dados detalhados...</p>
-        <p className="text-xs text-slate-400 mt-1">Aguarde um momento.</p>
+        <p className="text-slate-600 font-semibold text-lg">Carregando análises acadêmicas...</p>
+        <p className="text-sm text-slate-400 mt-2">Preparando gráficos de desempenho dos alunos.</p>
       </div>
     );
   }
 
   const studentAverageScores = students.map(s => s.averageScore || 0);
   const averageScoreDistribution = {
-    '0-20%': studentAverageScores.filter(s => s <= 20).length,
-    '21-40%': studentAverageScores.filter(s => s > 20 && s <= 40).length,
-    '41-60%': studentAverageScores.filter(s => s > 40 && s <= 60).length,
-    '61-80%': studentAverageScores.filter(s => s > 60 && s <= 80).length,
-    '81-100%': studentAverageScores.filter(s => s > 80 && s <= 100).length,
+    'Excelente (90-100%)': studentAverageScores.filter(s => s >= 90).length,
+    'Muito Bom (80-89%)': studentAverageScores.filter(s => s >= 80 && s < 90).length,
+    'Bom (70-79%)': studentAverageScores.filter(s => s >= 70 && s < 80).length,
+    'Regular (60-69%)': studentAverageScores.filter(s => s >= 60 && s < 70).length,
+    'Precisa Melhorar (<60%)': studentAverageScores.filter(s => s < 60).length,
   };
 
   const barChartData = {
     labels: Object.keys(averageScoreDistribution),
     datasets: [
       {
-        label: 'Nº de Alunos por Faixa de Média',
+        label: 'Número de Alunos',
         data: Object.values(averageScoreDistribution),
         backgroundColor: [
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(255, 159, 64, 0.7)',
-            'rgba(255, 205, 86, 0.7)',
-            'rgba(75, 192, 192, 0.7)',
-            'rgba(54, 162, 235, 0.7)',
+            'rgba(34, 197, 94, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(249, 115, 22, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
         ],
         borderColor: [
-            'rgb(255, 99, 132)',
-            'rgb(255, 159, 64)',
-            'rgb(255, 205, 86)',
-            'rgb(75, 192, 192)',
-            'rgb(54, 162, 235)',
+            'rgb(34, 197, 94)',
+            'rgb(59, 130, 246)',
+            'rgb(245, 158, 11)',
+            'rgb(249, 115, 22)',
+            'rgb(239, 68, 68)',
         ],
-        borderWidth: 1,
-        borderRadius: 5,
+        borderWidth: 2,
+        borderRadius: 8,
         hoverBackgroundColor: [
-            'rgba(255, 99, 132, 0.9)',
-            'rgba(255, 159, 64, 0.9)',
-            'rgba(255, 205, 86, 0.9)',
-            'rgba(75, 192, 192, 0.9)',
-            'rgba(54, 162, 235, 0.9)',
+            'rgba(34, 197, 94, 0.9)',
+            'rgba(59, 130, 246, 0.9)',
+            'rgba(245, 158, 11, 0.9)',
+            'rgba(249, 115, 22, 0.9)',
+            'rgba(239, 68, 68, 0.9)',
         ]
       },
     ],
@@ -69,15 +69,31 @@ const ReportCharts = ({ students, activities, isLoading }) => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'top', labels: { font: { size: 12, family: 'Inter' }, color: '#4A5568' } },
-      title: { display: true, text: 'Distribuição de Médias dos Alunos', font: { size: 16, family: 'Inter', weight: 'bold' }, color: '#2D3748', padding: { bottom: 20 } },
+      legend: { 
+        position: 'top', 
+        labels: { 
+          font: { size: 14, family: 'Inter', weight: 'bold' }, 
+          color: '#374151',
+          padding: 20
+        } 
+      },
+      title: { 
+        display: true, 
+        text: 'Distribuição de Desempenho dos Alunos', 
+        font: { size: 18, family: 'Inter', weight: 'bold' }, 
+        color: '#1f2937', 
+        padding: { bottom: 30 } 
+      },
       tooltip: {
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        titleFont: { family: 'Inter', weight: 'bold' },
-        bodyFont: { family: 'Inter' },
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        titleFont: { family: 'Inter', weight: 'bold', size: 14 },
+        bodyFont: { family: 'Inter', size: 12 },
+        cornerRadius: 8,
         callbacks: {
           label: function(context) {
-            return `${context.dataset.label}: ${context.parsed.y} alunos`;
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
+            return `${context.dataset.label}: ${context.parsed.y} alunos (${percentage}%)`;
           }
         }
       }
@@ -85,47 +101,73 @@ const ReportCharts = ({ students, activities, isLoading }) => {
     scales: {
       y: { 
         beginAtZero: true, 
-        title: { display: true, text: 'Número de Alunos', font: { family: 'Inter', weight: 'semibold' }, color: '#4A5568' },
-        ticks: { stepSize: 1, font: { family: 'Inter' }, color: '#718096' }
+        title: { 
+          display: true, 
+          text: 'Número de Alunos', 
+          font: { family: 'Inter', weight: 'semibold', size: 14 }, 
+          color: '#4B5563' 
+        },
+        ticks: { 
+          stepSize: 1, 
+          font: { family: 'Inter', size: 12 }, 
+          color: '#6B7280' 
+        },
+        grid: {
+          color: 'rgba(156, 163, 175, 0.3)'
+        }
       },
       x: {
-        title: { display: true, text: 'Faixa de Média (%)', font: { family: 'Inter', weight: 'semibold' }, color: '#4A5568' },
-        ticks: { font: { family: 'Inter' }, color: '#718096' }
+        title: { 
+          display: true, 
+          text: 'Faixas de Desempenho', 
+          font: { family: 'Inter', weight: 'semibold', size: 14 }, 
+          color: '#4B5563' 
+        },
+        ticks: { 
+          font: { family: 'Inter', size: 11 }, 
+          color: '#6B7280',
+          maxRotation: 45
+        },
+        grid: {
+          display: false
+        }
       }
     },
   };
 
-  const activityTypes = activities.reduce((acc, activity) => {
-    let type = 'Outra';
-    if (activity.action?.includes('adicionou o novo aluno')) type = 'Novo Aluno';
-    else if (activity.action?.includes('atualizou os dados do aluno')) type = 'Edição de Aluno';
-    else if (activity.action?.includes('removeu o aluno')) type = 'Remoção de Aluno';
-    else if (activity.action?.includes('adicionou nova notícia')) type = 'Nova Notícia';
-    else if (activity.action?.includes('editou a notícia')) type = 'Edição de Notícia';
-    else if (activity.action?.includes('removeu a notícia')) type = 'Remoção de Notícia';
-    else if (activity.action?.includes('adicionou novo evento')) type = 'Novo Evento';
-    else if (activity.action?.includes('editou o evento')) type = 'Edição de Evento';
-    else if (activity.action?.includes('removeu o evento')) type = 'Remoção de Evento';
-    
-    acc[type] = (acc[type] || 0) + 1;
-    return acc;
-  }, {});
+  // Subject performance analysis
+  const subjectAverages = {
+    'Prova Paraná': students.reduce((sum, s) => sum + (s.stats?.provaParana || 0), 0) / (students.length || 1),
+    'Prova Acerta Brasil': students.reduce((sum, s) => sum + (s.stats?.saeb || 0), 0) / (students.length || 1),
+    'Rec.Ap.Português': students.reduce((sum, s) => sum + (s.stats?.provasInternas || 0), 0) / (students.length || 1),
+    'Rec.Ap.Matematica': students.reduce((sum, s) => sum + (s.stats?.provasExternas || 0), 0) / (students.length || 1),
+    'Plataformas Digitais': students.reduce((sum, s) => sum + (s.stats?.plataformasDigitais || 0), 0) / (students.length || 1),
+  };
 
   const pieChartData = {
-    labels: Object.keys(activityTypes),
+    labels: Object.keys(subjectAverages),
     datasets: [
       {
-        label: 'Tipos de Atividades Registradas',
-        data: Object.values(activityTypes),
+        label: 'Média por Área',
+        data: Object.values(subjectAverages).map(avg => Math.round(avg)),
         backgroundColor: [
-          'rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)',
-          'rgba(255, 99, 132, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)',
-          'rgba(100, 220, 150, 0.8)', 'rgba(200, 100, 100, 0.8)', 'rgba(120, 120, 200, 0.8)', 'rgba(220, 220, 100, 0.8)'
+          'rgba(59, 130, 246, 0.8)', 
+          'rgba(34, 197, 94, 0.8)', 
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(168, 85, 247, 0.8)', 
+          'rgba(249, 115, 22, 0.8)'
         ],
-        borderColor: 'rgba(255, 255, 255, 0.7)',
-        borderWidth: 1.5,
-        hoverOffset: 8,
+        borderColor: [
+          'rgb(59, 130, 246)', 
+          'rgb(34, 197, 94)', 
+          'rgb(245, 158, 11)',
+          'rgb(168, 85, 247)', 
+          'rgb(249, 115, 22)'
+        ],
+        borderWidth: 2,
+        hoverOffset: 12,
         hoverBorderColor: 'rgba(255, 255, 255, 1)',
+        hoverBorderWidth: 3,
       },
     ],
   };
@@ -134,42 +176,56 @@ const ReportCharts = ({ students, activities, isLoading }) => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'right', labels: { font: { size: 11, family: 'Inter' }, color: '#4A5568', boxWidth: 15, padding: 15 } },
-      title: { display: true, text: 'Distribuição de Atividades da Secretaria', font: { size: 16, family: 'Inter', weight: 'bold' }, color: '#2D3748', padding: { bottom: 20 } },
+      legend: { 
+        position: 'right', 
+        labels: { 
+          font: { size: 12, family: 'Inter', weight: 'semibold' }, 
+          color: '#374151', 
+          boxWidth: 20, 
+          padding: 15,
+          usePointStyle: true,
+          pointStyle: 'circle'
+        } 
+      },
+      title: { 
+        display: true, 
+        text: 'Desempenho Médio por Área de Conhecimento', 
+        font: { size: 18, family: 'Inter', weight: 'bold' }, 
+        color: '#1f2937', 
+        padding: { bottom: 30 } 
+      },
        tooltip: {
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        titleFont: { family: 'Inter', weight: 'bold' },
-        bodyFont: { family: 'Inter' },
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        titleFont: { family: 'Inter', weight: 'bold', size: 14 },
+        bodyFont: { family: 'Inter', size: 12 },
+        cornerRadius: 8,
         callbacks: {
           label: function(context) {
             const label = context.label || '';
             const value = context.parsed || 0;
-            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-            return `${label}: ${value} (${percentage}%)`;
+            return `${label}: ${value}% (média da turma)`;
           }
         }
       }
     },
   };
 
-  if (students.length === 0 && activities.length === 0) {
+  if (students.length === 0) {
     return (
          <motion.div 
             initial={{ opacity:0, y:20 }}
             animate={{ opacity:1, y:0 }}
             transition={{ delay:0.2, duration: 0.5 }}
-            className="mt-10 p-8 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 text-center print:hidden shadow-lg"
+            className="mt-10 p-8 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border-2 border-dashed border-slate-300 text-center print:hidden shadow-lg"
         >
-            <BarChartHorizontal className="w-16 h-16 text-slate-400 mx-auto mb-4 animate-pulse"/>
-            <h4 className="text-xl text-slate-600 font-semibold mb-2">Sem dados para exibir gráficos.</h4>
+            <BarChartHorizontal className="w-20 h-20 text-slate-400 mx-auto mb-6 animate-pulse"/>
+            <h4 className="text-2xl text-slate-600 font-bold mb-3">Sem dados para análise</h4>
             <p className="text-sm text-slate-500">
-              Os gráficos de desempenho e atividades aparecerão aqui quando houver dados suficientes.
+              Os gráficos de desempenho acadêmico aparecerão aqui quando houver dados dos alunos.
             </p>
         </motion.div>
     );
   }
-
 
   return (
     <motion.div 
@@ -178,23 +234,29 @@ const ReportCharts = ({ students, activities, isLoading }) => {
         transition={{ delay:0.3, duration:0.6 }}
         className="mt-10 space-y-10"
     >
-      {students.length > 0 && (
-        <div className="bg-white p-5 md:p-7 rounded-xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300">
-          <h4 className="text-lg font-semibold text-gray-700 mb-5 print:text-base print:mb-3">Desempenho Geral dos Alunos</h4>
-          <div className="h-[350px] md:h-[450px] print:h-[300px]">
-            <Bar data={barChartData} options={barChartOptions} />
+      <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300 card-hover">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <TrendingUp className="w-6 h-6 text-blue-600" />
           </div>
+          <h4 className="text-xl font-bold text-gray-700 print:text-base">Análise de Desempenho Acadêmico</h4>
         </div>
-      )}
+        <div className="h-[400px] md:h-[500px] print:h-[300px]">
+          <Bar data={barChartData} options={barChartOptions} />
+        </div>
+      </div>
 
-      {activities.length > 0 && (
-         <div className="bg-white p-5 md:p-7 rounded-xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300">
-            <h4 className="text-lg font-semibold text-gray-700 mb-5 print:text-base print:mb-3">Atividades da Secretaria</h4>
-            <div className="h-[350px] md:h-[400px] print:h-[280px] mx-auto max-w-md md:max-w-lg lg:max-w-xl">
-                 <Pie data={pieChartData} options={pieChartOptions} />
-            </div>
+      <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300 card-hover">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <BookOpen className="w-6 h-6 text-green-600" />
+          </div>
+          <h4 className="text-xl font-bold text-gray-700 print:text-base">Desempenho por Área de Conhecimento</h4>
         </div>
-      )}
+        <div className="h-[400px] md:h-[450px] print:h-[280px] mx-auto max-w-2xl">
+             <Pie data={pieChartData} options={pieChartOptions} />
+        </div>
+      </div>
     </motion.div>
   );
 };

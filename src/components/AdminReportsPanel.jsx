@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Users, Newspaper, CalendarDays, AlertCircle as ActivityIcon, Filter, Download, AlertTriangle, Printer, Award } from 'lucide-react';
+import { BarChart3, Users, AlertTriangle, Printer, Award, Download, TrendingUp, TrendingDown, Minus, BookOpen, GraduationCap, Target, Star } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getCountFromServer, Timestamp, getDocs, orderBy } from "firebase/firestore";
 import { toast } from '@/components/ui/use-toast';
@@ -9,42 +9,54 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ReportCharts from '@/components/ReportCharts'; 
 
-const StatCard = ({ label, value, icon, color, isLoading }) => (
-  <motion.div
-    variants={{
-      hidden: { opacity: 0, y: 20, scale: 0.95 },
-      visible: { opacity: 1, y: 0, scale: 1 }
-    }}
-    className={`bg-white p-5 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center space-x-4 border-t-4 ${color}`}
-  >
-    <div className={`p-3 rounded-full ${color.replace('border-', 'bg-').replace('500', '100')} shadow-md`}>
-      {React.cloneElement(icon, { className: `w-7 h-7 ${color.replace('border-', 'text-')}` })}
-    </div>
-    <div>
-      {isLoading ? (
-        <div className="h-7 bg-gray-200 rounded w-14 animate-pulse mb-1"></div>
-      ) : (
-        <p className="text-3xl font-bold text-gray-800">{value}</p>
-      )}
-      <p className="text-sm text-gray-500">{label}</p>
-    </div>
-  </motion.div>
-);
+const StatCard = ({ label, value, icon, color, isLoading, trend }) => {
+  let TrendIcon = Minus;
+  if (trend === 'up') TrendIcon = TrendingUp;
+  if (trend === 'down') TrendIcon = TrendingDown;
+
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 25, scale: 0.95 },
+        visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
+      }}
+      className={`bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center space-x-4 card-hover transform hover:-translate-y-2 border-t-4 ${color} relative overflow-hidden`}
+    >
+      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-10 translate-x-10"></div>
+      <div className={`p-4 rounded-2xl ${color.replace('border-', 'bg-').replace('500', '100')} shadow-lg relative z-10`}>
+        {React.cloneElement(icon, { className: `w-8 h-8 ${color.replace('border-', 'text-')}` })}
+      </div>
+      <div className="relative z-10">
+        {isLoading ? (
+          <div className="h-8 bg-gray-200 rounded w-20 animate-pulse mb-2"></div>
+        ) : (
+          <p className="text-3xl font-bold text-gray-800">{value}</p>
+        )}
+        <p className="text-sm text-gray-600 font-medium">{label}</p>
+        {trend && (
+          <div className="flex items-center mt-1">
+            <TrendIcon className={`w-4 h-4 mr-1 ${trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-gray-400'}`} />
+            <span className="text-xs text-gray-500">Tendência</span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
 
 const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
   const [timeRange, setTimeRange] = useState('all'); 
   const [reportData, setReportData] = useState({
     totalStudents: 0,
-    newsPublished: 0,
-    eventsScheduled: 0,
-    activitiesLogged: 0,
+    averageScore: 0,
+    topPerformers: 0,
+    needsAttention: 0,
     startDate: null,
     endDate: null,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rankedStudentsForReport, setRankedStudentsForReport] = useState([]);
-  const [activitiesData, setActivitiesData] = useState([]);
   const reportContentRef = useRef(null);
 
   const timeRanges = [
@@ -68,34 +80,10 @@ const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
           startDateObj.setDate(startDateObj.getDate() - days);
           startDateObj.setHours(0, 0, 0, 0); 
         }
-        const startDateTimestamp = startDateObj ? Timestamp.fromDate(startDateObj) : null;
         
         const studentsQuery = query(collection(db, 'users'), where("type", "==", "student"));
         const studentsSnap = await getCountFromServer(studentsQuery);
         const totalStudents = studentsSnap.data().count;
-
-        let newsQuery = collection(db, 'news');
-        if (startDateTimestamp) newsQuery = query(newsQuery, where('createdAt', '>=', startDateTimestamp));
-        const newsSnap = await getCountFromServer(newsQuery);
-        const newsPublished = newsSnap.data().count;
-        
-        let eventsQuery = collection(db, 'events');
-        if (startDateTimestamp) eventsQuery = query(eventsQuery, where('createdAt', '>=', startDateTimestamp));
-        const eventsSnap = await getCountFromServer(eventsQuery);
-        const eventsScheduled = eventsSnap.data().count;
-
-        let activitiesFirestoreQuery = collection(db, 'activities');
-        if (startDateTimestamp) activitiesFirestoreQuery = query(activitiesFirestoreQuery, where('timestamp', '>=', startDateTimestamp));
-        const activitiesDocsSnap = await getDocs(query(activitiesFirestoreQuery, orderBy('timestamp', 'desc')));
-        const activitiesLoggedList = activitiesDocsSnap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        const activitiesLogged = activitiesLoggedList.length;
-        setActivitiesData(activitiesLoggedList);
-
-        setReportData({
-          totalStudents, newsPublished, eventsScheduled, activitiesLogged,
-          startDate: startDateObj ? startDateObj.toLocaleDateString('pt-BR') : 'Início',
-          endDate: endDateObj.toLocaleDateString('pt-BR'),
-        });
 
         const rankedStudents = initialAllStudents
             .map(student => {
@@ -111,7 +99,24 @@ const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
                 if (b.averageScore !== a.averageScore) return b.averageScore - a.averageScore;
                 return a.name.localeCompare(b.name);
             });
+        
         setRankedStudentsForReport(rankedStudents);
+
+        const overallAverage = rankedStudents.length > 0 
+          ? Math.round(rankedStudents.reduce((sum, student) => sum + student.averageScore, 0) / rankedStudents.length)
+          : 0;
+
+        const topPerformers = rankedStudents.filter(student => student.averageScore >= 80).length;
+        const needsAttention = rankedStudents.filter(student => student.averageScore < 60).length;
+
+        setReportData({
+          totalStudents,
+          averageScore: overallAverage,
+          topPerformers,
+          needsAttention,
+          startDate: startDateObj ? startDateObj.toLocaleDateString('pt-BR') : 'Início',
+          endDate: endDateObj.toLocaleDateString('pt-BR'),
+        });
 
       } catch (err) {
         console.error("Erro ao buscar dados para relatórios:", err);
@@ -125,10 +130,10 @@ const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
   }, [timeRange, initialAllStudents]);
 
   const reportCardsData = [
-    { label: "Total de Alunos", value: reportData.totalStudents, icon: <Users />, color: "border-emerald-500" },
-    { label: "Notícias Publicadas", value: reportData.newsPublished, icon: <Newspaper />, color: "border-sky-500" },
-    { label: "Eventos Agendados", value: reportData.eventsScheduled, icon: <CalendarDays />, color: "border-purple-500" },
-    { label: "Atividades Registradas", value: reportData.activitiesLogged, icon: <ActivityIcon />, color: "border-amber-500" },
+    { label: "Total de Alunos", value: reportData.totalStudents, icon: <Users />, color: "border-emerald-500", trend: "stable" },
+    { label: "Média Geral da Turma", value: `${reportData.averageScore}%`, icon: <BarChart3 />, color: "border-sky-500", trend: "up" },
+    { label: "Alto Desempenho (≥80%)", value: reportData.topPerformers, icon: <Star />, color: "border-amber-500", trend: "up" },
+    { label: "Precisam de Atenção (<60%)", value: reportData.needsAttention, icon: <Target />, color: "border-red-500", trend: "down" },
   ];
   
   const handlePrintReport = () => {
@@ -181,7 +186,7 @@ const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
   };
 
   return (
-    <div className="space-y-8 p-4 md:p-6 bg-gradient-to-br from-slate-100 via-gray-100 to-stone-200 rounded-2xl shadow-2xl min-h-[calc(100vh-8rem)]">
+    <div className="space-y-8 p-4 md:p-6 bg-gradient-to-br from-slate-50 via-gray-50 to-stone-100 rounded-2xl shadow-2xl min-h-[calc(100vh-8rem)]">
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -189,53 +194,63 @@ const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
         className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b-2 border-gray-200 print:hidden"
       >
         <div className="flex items-center space-x-4">
-          <BarChart3 className="w-10 h-10 text-indigo-700" />
+          <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg">
+            <BarChart3 className="w-10 h-10 text-white" />
+          </div>
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">Relatórios Gerais</h2>
-            <p className="text-gray-600 text-sm">Visão geral das atividades e dados do portal.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">Relatórios Acadêmicos</h2>
+            <p className="text-gray-600 text-sm">Análise completa do desempenho dos alunos do 9º ano.</p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           <div className="relative w-full sm:w-auto">
-            <Filter className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)} className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm appearance-none bg-white">
+            <select 
+              value={timeRange} 
+              onChange={(e) => setTimeRange(e.target.value)} 
+              className="w-full pl-4 pr-8 py-3 border border-gray-300 rounded-xl shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm appearance-none bg-white hover:shadow-lg transition-all"
+            >
               {timeRanges.map(range => (<option key={range.value} value={range.value}>{range.label}</option>))}
             </select>
           </div>
-          <Button className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto py-3 px-5" onClick={handleDownloadPdf} disabled={isLoading}>
+          <Button className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto py-3 px-5 rounded-xl" onClick={handleDownloadPdf} disabled={isLoading}>
             <Download className="w-4 h-4 mr-2.5" />{isLoading ? "Carregando..." : "Baixar PDF"}
           </Button>
-          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto py-3 px-5" onClick={handlePrintReport}>
-            <Printer className="w-4 h-4 mr-2.5" />Imprimir Relatório
+          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto py-3 px-5 rounded-xl" onClick={handlePrintReport}>
+            <Printer className="w-4 h-4 mr-2.5" />Imprimir
           </Button>
         </div>
       </motion.div>
 
-      <div ref={reportContentRef} className="report-content bg-white p-6 print:p-4 print:shadow-none print:border-none rounded-xl shadow-xl">
+      <div ref={reportContentRef} className="report-content bg-white p-6 print:p-4 print:shadow-none print:border-none rounded-2xl shadow-xl">
         <div className="print-header print:visible-for-pdf hidden mb-8 text-center border-b-2 pb-6 border-gray-300">
             <img src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/fabd3a46ec76ba6fff9fec1d4c650677.jpg" alt="Logo Escola" className="w-20 h-20 mx-auto mb-3 rounded-full shadow-md p-1 bg-emerald-50 border border-emerald-200"/>
             <h1 className="text-2xl font-bold text-emerald-700">Escola Estadual do Campo Vinícius de Moraes</h1>
-            <p className="text-md text-gray-700">Relatório Geral Consolidado</p>
+            <p className="text-md text-gray-700">Relatório Acadêmico do 9º Ano</p>
             <p className="text-sm text-gray-500">Período: {reportData.startDate} até {reportData.endDate}</p>
             <p className="text-xs text-gray-400 mt-1">Gerado em: {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
         </div>
 
-        {error && ( <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-100 border-l-4 border-red-500 text-red-700 p-5 rounded-lg shadow-lg flex items-center print:hidden mb-6" role="alert"> <AlertTriangle className="h-6 w-6 mr-3.5" /> <p>{error}</p> </motion.div> )}
+        {error && ( 
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-100 border-l-4 border-red-500 text-red-700 p-5 rounded-lg shadow-lg flex items-center print:hidden mb-6" role="alert"> 
+            <AlertTriangle className="h-6 w-6 mr-3.5" /> 
+            <p>{error}</p> 
+          </motion.div> 
+        )}
 
         <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } }}} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {reportCardsData.map((card) => ( <StatCard key={card.label} {...card} isLoading={isLoading} /> ))}
         </motion.div>
         
-        <ReportCharts students={rankedStudentsForReport} activities={activitiesData} isLoading={isLoading} />
+        <ReportCharts students={rankedStudentsForReport} isLoading={isLoading} />
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="bg-white p-0 md:p-6 rounded-xl shadow-xl mt-10 border border-gray-200 print:shadow-none print:border-gray-300 print:p-0">
-          <div className="flex items-center space-x-3 mb-5 p-3 bg-gradient-to-r from-emerald-500 to-green-600 rounded-t-lg">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="bg-white p-0 md:p-6 rounded-2xl shadow-xl mt-10 border border-gray-200 print:shadow-none print:border-gray-300 print:p-0">
+          <div className="flex items-center space-x-3 mb-5 p-4 bg-gradient-to-r from-emerald-500 to-green-600 rounded-t-2xl">
             <Award className="w-7 h-7 text-yellow-300" />
-            <h3 className="text-xl font-semibold text-white tracking-wide">Ranking Geral Detalhado dos Alunos</h3>
+            <h3 className="text-xl font-semibold text-white tracking-wide">Ranking Acadêmico Detalhado</h3>
           </div>
           {isLoading ? (<p className="text-gray-500 text-center py-6">Carregando ranking...</p>)
           : rankedStudentsForReport.length > 0 ? (
-            <div className="overflow-x-auto print:overflow-visible rounded-b-lg">
+            <div className="overflow-x-auto print:overflow-visible rounded-b-2xl">
               <table className="w-full text-sm print:text-[8pt]">
                 <thead className="bg-gray-100 print:bg-gray-200">
                   <tr className="shadow-sm">
@@ -268,6 +283,33 @@ const AdminReportsPanel = ({ allStudents: initialAllStudents }) => {
               </table>
             </div>
           ) : (<p className="text-gray-500 text-center py-6">Nenhum aluno no ranking.</p>)}
+        </motion.div>
+
+        {/* Insights Section */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.5 }} className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-6 rounded-2xl border border-blue-200 shadow-lg">
+            <div className="flex items-center space-x-3 mb-4">
+              <GraduationCap className="w-8 h-8 text-blue-600" />
+              <h4 className="text-lg font-semibold text-blue-800">Análise de Desempenho</h4>
+            </div>
+            <div className="space-y-3 text-sm text-blue-700">
+              <p>• <strong>{reportData.topPerformers}</strong> alunos com excelente desempenho (≥80%)</p>
+              <p>• <strong>{rankedStudentsForReport.filter(s => s.averageScore >= 60 && s.averageScore < 80).length}</strong> alunos com bom desempenho (60-79%)</p>
+              <p>• <strong>{reportData.needsAttention}</strong> alunos precisam de atenção especial (&lt;60%)</p>
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-2xl border border-green-200 shadow-lg">
+            <div className="flex items-center space-x-3 mb-4">
+              <BookOpen className="w-8 h-8 text-green-600" />
+              <h4 className="text-lg font-semibold text-green-800">Recomendações</h4>
+            </div>
+            <div className="space-y-3 text-sm text-green-700">
+              <p>• Reforço em matemática para alunos com baixo desempenho</p>
+              <p>• Programa de mentoria entre alunos de alto e baixo rendimento</p>
+              <p>• Atividades extras para manter motivação dos top performers</p>
+            </div>
+          </div>
         </motion.div>
       </div>
         <style jsx global>{`

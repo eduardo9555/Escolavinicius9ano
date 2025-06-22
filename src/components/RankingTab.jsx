@@ -47,9 +47,9 @@ const RankingTab = ({ user, allStudents = [] }) => {
   };
 
   const getPodiumHeight = (position) => {
-    if (position === 1) return "h-48"; 
-    if (position === 2) return "h-40"; 
-    if (position === 3) return "h-32"; 
+    if (position === 1) return "h-48 sm:h-52"; 
+    if (position === 2) return "h-40 sm:h-44"; 
+    if (position === 3) return "h-32 sm:h-36"; 
     return "h-24";
   };
 
@@ -124,14 +124,14 @@ const RankingTab = ({ user, allStudents = [] }) => {
                     />
                   </div>
                   <div className={`bg-white/80 backdrop-blur-sm px-4 py-3 rounded-lg shadow-md w-full max-w-xs ${getPodiumHeight(position)} flex flex-col justify-between items-center border-t-4 ${getMedalClass(position).replace('bg-gradient-to-br from-', 'border-')}`}>
-                    <div className="text-center">
-                      {position === 1 && <Trophy className={`w-10 h-10 mx-auto mb-1 ${getMedalColor(position)}`} />}
-                      {position === 2 && <Medal className={`w-10 h-10 mx-auto mb-1 ${getMedalColor(position)}`} />}
-                      {position === 3 && <Award className={`w-10 h-10 mx-auto mb-1 ${getMedalColor(position)}`} />}
-                      <p className={`font-bold text-lg ${getMedalColor(position).replace('text-', 'text-gray-')}`}>{student.name}</p>
+                    <div className="text-center flex-1 flex flex-col justify-center">
+                      {position === 1 && <Trophy className={`w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 ${getMedalColor(position)}`} />}
+                      {position === 2 && <Medal className={`w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 ${getMedalColor(position)}`} />}
+                      {position === 3 && <Award className={`w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 ${getMedalColor(position)}`} />}
+                      <p className={`font-bold text-base sm:text-lg text-gray-700 mb-1`}>{student.name}</p>
                       <p className={`text-sm font-medium text-gray-600`}>{student.averageScore}%</p>
                     </div>
-                    <div className={`font-bold text-3xl sm:text-4xl ${getMedalColor(position)}`}>{position}º</div>
+                    <div className={`font-bold text-2xl sm:text-3xl ${getMedalColor(position)} mt-2`}>{position}º</div>
                   </div>
                 </motion.div>
               );
@@ -166,7 +166,7 @@ const RankingTab = ({ user, allStudents = [] }) => {
                 <div className="flex items-center space-x-3 sm:space-x-4">
                   <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${getMedalClass(index + 1)} ${index < 3 ? getMedalColor(index+1) : 'text-gray-700'}`}>
                     {index < 3 ? 
-                     (index === 0 ? <Trophy className="w-6 h-6" /> : index === 1 ? <Medal className="w-6 h-6" /> : <Award className="w-6 h-6" />)
+                     (index === 0 ? <Trophy className="w-5 h-5 sm:w-6 sm:h-6" /> : index === 1 ? <Medal className="w-5 h-5 sm:w-6 sm:h-6" /> : <Award className="w-5 h-5 sm:w-6 sm:h-6" />)
                      : `#${index + 1}`}
                   </div>
                   
