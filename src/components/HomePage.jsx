@@ -52,52 +52,52 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
       </div>
 
       <motion.header 
-        className="relative z-10 p-6"
+        className="relative z-10 p-4 sm:p-6"
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 sm:space-x-4">
             <motion.div 
-              className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center glass-effect shadow-xl border border-white/30"
+              className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center glass-effect shadow-xl border border-white/30"
               whileHover={{ scale: 1.1, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               <img 
                 src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/fabd3a46ec76ba6fff9fec1d4c650677.jpg"
                 alt="Logo da Escola"
-                className="w-10 h-10 object-contain rounded-full"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-full"
               />
             </motion.div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">Escola Estadual do Campo</h1>
-              <p className="text-white/80 text-sm sm:text-base">Vinícius de Moraes - 9º Ano</p>
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Escola Estadual do Campo</h1>
+              <p className="text-white/80 text-xs sm:text-sm md:text-base">Vinícius de Moraes - 9º Ano</p>
             </div>
           </div>
         </div>
       </motion.header>
 
-      <main className="relative z-10 flex-grow flex items-center max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <main className="relative z-10 flex-grow flex items-center max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-8 sm:py-12">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center w-full">
           <motion.div
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <motion.div 
-                className="inline-flex items-center space-x-2 bg-white/20 text-white px-4 py-2.5 rounded-full text-sm font-medium shadow-lg glass-effect border border-white/30"
+                className="inline-flex items-center space-x-1.5 sm:space-x-2 bg-white/20 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium shadow-lg glass-effect border border-white/30"
                 initial={{ opacity:0, y:10 }}
                 animate={{ opacity:1, y:0 }}
                 transition={{ delay: 0.3 }}
               >
-                <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 animate-pulse" />
                 <span>{randomMessage}</span>
               </motion.div>
               <motion.h2 
-                className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-tight tracking-tight"
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
@@ -109,7 +109,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
               </motion.h2>
               
               <motion.p 
-                className="text-lg sm:text-xl text-white/90 leading-relaxed"
+                className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed"
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
@@ -120,30 +120,30 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
             </div>
 
             <motion.div 
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4"
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
             >
               <Button
                 onClick={() => onLogin('student')}
-                className="w-full sm:w-auto bg-white text-green-700 hover:bg-green-50 text-lg px-8 py-4 rounded-xl font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300 pulse-glow border-2 border-emerald-500"
+                className="w-full sm:w-auto bg-white text-green-700 hover:bg-green-50 text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300 pulse-glow border-2 border-emerald-500"
               >
-                <Users className="w-6 h-6 mr-3" />
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                 Entrar como Aluno
               </Button>
               
               <Button
                 onClick={() => onLogin('admin')}
                 variant="outline"
-                className="w-full sm:w-auto bg-white/20 text-white hover:bg-white/30 border-white/50 hover:border-white text-lg px-8 py-4 rounded-xl font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300 glass-effect"
+                className="w-full sm:w-auto bg-white/20 text-white hover:bg-white/30 border-white/50 hover:border-white text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300 glass-effect"
               >
-                <Award className="w-6 h-6 mr-3" />
+                <Award className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
                 Acesso da Secretaria
               </Button>
             </motion.div>
             <motion.p 
-              className="text-sm text-white/70"
+              className="text-xs sm:text-sm text-white/70"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
@@ -158,26 +158,26 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
             transition={{ duration: 1, delay: 0.4, type: "spring", stiffness: 100 }}
             className="hidden lg:block"
           >
-            <div className="relative glass-effect p-8 rounded-3xl shadow-2xl border-2 border-white/20">
+            <div className="relative glass-effect p-6 sm:p-8 rounded-3xl shadow-2xl border-2 border-white/20">
               <motion.img 
                 src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/d3e82f464b6bd1fa35d02a534ff070fd.png"
                 alt="Mascote da escola apresentando"
-                className="w-[380px] h-auto object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.3)] floating-animation"
+                className="w-[300px] sm:w-[380px] h-auto object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.3)] floating-animation"
                 drag
                 dragConstraints={{ left: -15, right: 15, top: -15, bottom: 15 }}
               />
               <motion.div
-                className="absolute -top-5 -right-5 w-12 h-12 bg-yellow-300/50 rounded-full opacity-70"
+                className="absolute -top-5 -right-5 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-300/50 rounded-full opacity-70"
                 animate={{ scale: [1, 1.2, 1], rotate: 360 }}
                 transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
               />
               <motion.div
-                className="absolute -bottom-5 -left-5 w-10 h-10 bg-blue-300/50 rounded-full opacity-70"
+                className="absolute -bottom-5 -left-5 w-8 h-8 sm:w-10 sm:h-10 bg-blue-300/50 rounded-full opacity-70"
                 animate={{ y: [-12, 12, -12], x: [-4, 4, -4] }}
                 transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
               />
-               <div className="absolute bottom-6 right-6 bg-white/30 backdrop-blur-sm p-3 rounded-lg shadow-lg text-white text-xs">
-                  <Sparkles className="w-4 h-4 inline mr-1 text-yellow-300" />
+               <div className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 bg-white/30 backdrop-blur-sm p-2 sm:p-3 rounded-lg shadow-lg text-white text-xs">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 text-yellow-300" />
                   Sempre aprendendo!
                </div>
             </div>
@@ -187,27 +187,27 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
 
       {(latestNews.length > 0 || latestEvents.length > 0) && (
          <motion.section 
-            className="relative z-10 py-12 px-4 sm:px-6 bg-white/5 backdrop-blur-md"
+            className="relative z-10 py-8 sm:py-12 px-3 sm:px-4 md:px-6 bg-white/5 backdrop-blur-md"
             initial={{ opacity:0, y:50 }}
             animate={{ opacity:1, y:0 }}
             transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
           >
-            <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+            <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 sm:gap-8">
               {latestNews.length > 0 && (
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
-                    <Newspaper className="w-7 h-7 mr-3 text-sky-300"/> Últimas Notícias
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+                    <Newspaper className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-3 text-sky-300"/> Últimas Notícias
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {latestNews.map(news => (
                       <motion.div 
                         key={news.id} 
-                        className="bg-white/10 p-4 rounded-lg shadow-md hover:bg-white/20 transition-colors border border-white/20"
+                        className="bg-white/10 p-3 sm:p-4 rounded-lg shadow-md hover:bg-white/20 transition-colors border border-white/20"
                         whileHover={{ scale: 1.02 }}
                       >
-                        <h4 className="font-semibold text-white text-base truncate">{news.title}</h4>
-                        <p className="text-sm text-white/80 line-clamp-2">{news.summary}</p>
-                        <div className="text-xs text-white/70 mt-1">{formatDate(news.createdAt)}</div>
+                        <h4 className="font-semibold text-white text-sm sm:text-base truncate">{news.title}</h4>
+                        <p className="text-xs sm:text-sm text-white/80 line-clamp-2">{news.summary}</p>
+                        <div className="text-[10px] sm:text-xs text-white/70 mt-1">{formatDate(news.createdAt)}</div>
                       </motion.div>
                     ))}
                   </div>
@@ -215,19 +215,19 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
               )}
               {latestEvents.length > 0 && (
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
-                     <CalendarDays className="w-7 h-7 mr-3 text-amber-300"/> Próximos Eventos
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
+                     <CalendarDays className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-3 text-amber-300"/> Próximos Eventos
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {latestEvents.map(event => (
                        <motion.div 
                         key={event.id} 
-                        className="bg-white/10 p-4 rounded-lg shadow-md hover:bg-white/20 transition-colors border border-white/20"
+                        className="bg-white/10 p-3 sm:p-4 rounded-lg shadow-md hover:bg-white/20 transition-colors border border-white/20"
                         whileHover={{ scale: 1.02 }}
                       >
-                        <h4 className="font-semibold text-white text-base truncate">{event.title}</h4>
-                        <p className="text-sm text-white/80 truncate">{event.location}</p>
-                        <div className="text-xs text-white/70 mt-1">
+                        <h4 className="font-semibold text-white text-sm sm:text-base truncate">{event.title}</h4>
+                        <p className="text-xs sm:text-sm text-white/80 truncate">{event.location}</p>
+                        <div className="text-[10px] sm:text-xs text-white/70 mt-1">
                           {formatEventDate(event.date)} às {event.time}
                         </div>
                       </motion.div>
@@ -241,13 +241,13 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
 
 
       <motion.footer 
-        className="relative z-10 border-t border-white/20 py-8"
+        className="relative z-10 border-t border-white/20 py-6 sm:py-8"
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
       >
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-white/80 text-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+          <p className="text-white/80 text-xs sm:text-sm">
             © {new Date().getFullYear()} Escola Estadual do Campo Vinícius de Moraes - 9º Ano. 
             Desenvolvido com ❤️ para motivar nossos estudantes.
           </p>

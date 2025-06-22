@@ -9,16 +9,16 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
 const ReportCharts = ({ students, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="mt-10 p-8 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border border-dashed border-slate-300 text-center print:hidden shadow-lg">
+      <div className="mt-6 sm:mt-10 p-6 sm:p-8 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border border-dashed border-slate-300 text-center print:hidden shadow-lg">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 text-slate-400 mx-auto mb-4"
+          className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400 mx-auto mb-3 sm:mb-4"
         >
             <Users/>
         </motion.div>
-        <p className="text-slate-600 font-semibold text-lg">Carregando análises acadêmicas...</p>
-        <p className="text-sm text-slate-400 mt-2">Preparando gráficos de desempenho dos alunos.</p>
+        <p className="text-slate-600 font-semibold text-base sm:text-lg">Carregando análises acadêmicas...</p>
+        <p className="text-xs sm:text-sm text-slate-400 mt-2">Preparando gráficos de desempenho dos alunos.</p>
       </div>
     );
   }
@@ -72,22 +72,22 @@ const ReportCharts = ({ students, isLoading }) => {
       legend: { 
         position: 'top', 
         labels: { 
-          font: { size: 14, family: 'Inter', weight: 'bold' }, 
+          font: { size: 12, family: 'Inter', weight: 'bold' }, 
           color: '#374151',
-          padding: 20
+          padding: 15
         } 
       },
       title: { 
         display: true, 
         text: 'Distribuição de Desempenho dos Alunos', 
-        font: { size: 18, family: 'Inter', weight: 'bold' }, 
+        font: { size: 16, family: 'Inter', weight: 'bold' }, 
         color: '#1f2937', 
-        padding: { bottom: 30 } 
+        padding: { bottom: 25 } 
       },
       tooltip: {
         backgroundColor: 'rgba(0,0,0,0.8)',
-        titleFont: { family: 'Inter', weight: 'bold', size: 14 },
-        bodyFont: { family: 'Inter', size: 12 },
+        titleFont: { family: 'Inter', weight: 'bold', size: 12 },
+        bodyFont: { family: 'Inter', size: 11 },
         cornerRadius: 8,
         callbacks: {
           label: function(context) {
@@ -104,12 +104,12 @@ const ReportCharts = ({ students, isLoading }) => {
         title: { 
           display: true, 
           text: 'Número de Alunos', 
-          font: { family: 'Inter', weight: 'semibold', size: 14 }, 
+          font: { family: 'Inter', weight: 'semibold', size: 12 }, 
           color: '#4B5563' 
         },
         ticks: { 
           stepSize: 1, 
-          font: { family: 'Inter', size: 12 }, 
+          font: { family: 'Inter', size: 11 }, 
           color: '#6B7280' 
         },
         grid: {
@@ -120,11 +120,11 @@ const ReportCharts = ({ students, isLoading }) => {
         title: { 
           display: true, 
           text: 'Faixas de Desempenho', 
-          font: { family: 'Inter', weight: 'semibold', size: 14 }, 
+          font: { family: 'Inter', weight: 'semibold', size: 12 }, 
           color: '#4B5563' 
         },
         ticks: { 
-          font: { family: 'Inter', size: 11 }, 
+          font: { family: 'Inter', size: 10 }, 
           color: '#6B7280',
           maxRotation: 45
         },
@@ -140,7 +140,7 @@ const ReportCharts = ({ students, isLoading }) => {
     'Prova Paraná': students.reduce((sum, s) => sum + (s.stats?.provaParana || 0), 0) / (students.length || 1),
     'Prova Acerta Brasil': students.reduce((sum, s) => sum + (s.stats?.saeb || 0), 0) / (students.length || 1),
     'Rec.Ap.Português': students.reduce((sum, s) => sum + (s.stats?.provasInternas || 0), 0) / (students.length || 1),
-    'Rec.Ap.Matematica': students.reduce((sum, s) => sum + (s.stats?.provasExternas || 0), 0) / (students.length || 1),
+    'Rec.Ap.Matemática': students.reduce((sum, s) => sum + (s.stats?.provasExternas || 0), 0) / (students.length || 1),
     'Plataformas Digitais': students.reduce((sum, s) => sum + (s.stats?.plataformasDigitais || 0), 0) / (students.length || 1),
   };
 
@@ -179,10 +179,10 @@ const ReportCharts = ({ students, isLoading }) => {
       legend: { 
         position: 'right', 
         labels: { 
-          font: { size: 12, family: 'Inter', weight: 'semibold' }, 
+          font: { size: 11, family: 'Inter', weight: 'semibold' }, 
           color: '#374151', 
-          boxWidth: 20, 
-          padding: 15,
+          boxWidth: 18, 
+          padding: 12,
           usePointStyle: true,
           pointStyle: 'circle'
         } 
@@ -190,14 +190,14 @@ const ReportCharts = ({ students, isLoading }) => {
       title: { 
         display: true, 
         text: 'Desempenho Médio por Área de Conhecimento', 
-        font: { size: 18, family: 'Inter', weight: 'bold' }, 
+        font: { size: 16, family: 'Inter', weight: 'bold' }, 
         color: '#1f2937', 
-        padding: { bottom: 30 } 
+        padding: { bottom: 25 } 
       },
        tooltip: {
         backgroundColor: 'rgba(0,0,0,0.8)',
-        titleFont: { family: 'Inter', weight: 'bold', size: 14 },
-        bodyFont: { family: 'Inter', size: 12 },
+        titleFont: { family: 'Inter', weight: 'bold', size: 12 },
+        bodyFont: { family: 'Inter', size: 11 },
         cornerRadius: 8,
         callbacks: {
           label: function(context) {
@@ -216,11 +216,11 @@ const ReportCharts = ({ students, isLoading }) => {
             initial={{ opacity:0, y:20 }}
             animate={{ opacity:1, y:0 }}
             transition={{ delay:0.2, duration: 0.5 }}
-            className="mt-10 p-8 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border-2 border-dashed border-slate-300 text-center print:hidden shadow-lg"
+            className="mt-6 sm:mt-10 p-6 sm:p-8 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border-2 border-dashed border-slate-300 text-center print:hidden shadow-lg"
         >
-            <BarChartHorizontal className="w-20 h-20 text-slate-400 mx-auto mb-6 animate-pulse"/>
-            <h4 className="text-2xl text-slate-600 font-bold mb-3">Sem dados para análise</h4>
-            <p className="text-sm text-slate-500">
+            <BarChartHorizontal className="w-16 h-16 sm:w-20 sm:h-20 text-slate-400 mx-auto mb-4 sm:mb-6 animate-pulse"/>
+            <h4 className="text-xl sm:text-2xl text-slate-600 font-bold mb-2 sm:mb-3">Sem dados para análise</h4>
+            <p className="text-xs sm:text-sm text-slate-500">
               Os gráficos de desempenho acadêmico aparecerão aqui quando houver dados dos alunos.
             </p>
         </motion.div>
@@ -232,28 +232,28 @@ const ReportCharts = ({ students, isLoading }) => {
         initial={{ opacity:0 }}
         animate={{ opacity:1 }}
         transition={{ delay:0.3, duration:0.6 }}
-        className="mt-10 space-y-10"
+        className="mt-6 sm:mt-10 space-y-6 sm:space-y-10"
     >
-      <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300 card-hover">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <TrendingUp className="w-6 h-6 text-blue-600" />
+      <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300 card-hover">
+        <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+          <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
           </div>
-          <h4 className="text-xl font-bold text-gray-700 print:text-base">Análise de Desempenho Acadêmico</h4>
+          <h4 className="text-lg sm:text-xl font-bold text-gray-700 print:text-base">Análise de Desempenho Acadêmico</h4>
         </div>
-        <div className="h-[400px] md:h-[500px] print:h-[300px]">
+        <div className="h-[300px] sm:h-[400px] md:h-[500px] print:h-[300px]">
           <Bar data={barChartData} options={barChartOptions} />
         </div>
       </div>
 
-      <div className="bg-white p-6 md:p-8 rounded-2xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300 card-hover">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-green-100 rounded-lg">
-            <BookOpen className="w-6 h-6 text-green-600" />
+      <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl border border-gray-200 print:shadow-none print:border-gray-300 card-hover">
+        <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+          <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg">
+            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
           </div>
-          <h4 className="text-xl font-bold text-gray-700 print:text-base">Desempenho por Área de Conhecimento</h4>
+          <h4 className="text-lg sm:text-xl font-bold text-gray-700 print:text-base">Desempenho por Área de Conhecimento</h4>
         </div>
-        <div className="h-[400px] md:h-[450px] print:h-[280px] mx-auto max-w-2xl">
+        <div className="h-[300px] sm:h-[400px] md:h-[450px] print:h-[280px] mx-auto max-w-2xl">
              <Pie data={pieChartData} options={pieChartOptions} />
         </div>
       </div>

@@ -5,12 +5,12 @@ import { Edit, Trash2, Eye } from 'lucide-react';
 
 const TableHeader = ({ label, sortKey, onSort, sortIcon }) => (
   <th 
-    className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
+    className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-left text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
     onClick={() => onSort(sortKey)}
   >
     <div className="flex items-center">
-      {label}
-      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <span className="truncate">{label}</span>
+      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-1">
         {sortIcon}
       </span>
     </div>
@@ -39,14 +39,14 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
         <thead className="bg-gray-50 border-b-2 border-gray-200">
           <tr>
             <TableHeader label="Aluno" sortKey="name" onSort={onSort} sortIcon={getSortIcon('name')} />
-            <TableHeader label="Prova Paraná" sortKey="provaParana" onSort={onSort} sortIcon={getSortIcon('provaParana')} />
-            <TableHeader label="Prova Acerta Brasil" sortKey="saeb" onSort={onSort} sortIcon={getSortIcon('saeb')} />
-            <TableHeader label="Rec.Ap.Português" sortKey="provasInternas" onSort={onSort} sortIcon={getSortIcon('provasInternas')} />
-            <TableHeader label="Rec.Ap.Matematica" sortKey="provasExternas" onSort={onSort} sortIcon={getSortIcon('provasExternas')} />
+            <TableHeader label="P. Paraná" sortKey="provaParana" onSort={onSort} sortIcon={getSortIcon('provaParana')} />
+            <TableHeader label="P. Acerta Brasil" sortKey="saeb" onSort={onSort} sortIcon={getSortIcon('saeb')} />
+            <TableHeader label="Rec.Ap.Port." sortKey="provasInternas" onSort={onSort} sortIcon={getSortIcon('provasInternas')} />
+            <TableHeader label="Rec.Ap.Mat." sortKey="provasExternas" onSort={onSort} sortIcon={getSortIcon('provasExternas')} />
             <TableHeader label="Frequência" sortKey="frequencia" onSort={onSort} sortIcon={getSortIcon('frequencia')} />
             <TableHeader label="Plataformas" sortKey="plataformasDigitais" onSort={onSort} sortIcon={getSortIcon('plataformasDigitais')} />
-            <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Média</th>
-            <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>
+            <th className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-left text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Média</th>
+            <th className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-left text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-100">
@@ -61,59 +61,59 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
               className={`transition-colors duration-150 ${selectedStudentId === student.id ? 'bg-emerald-100/70' : 'hover:bg-emerald-50/50'}`}
               
             >
-              <td className="px-4 py-3.5 whitespace-nowrap cursor-pointer" onClick={() => onRowClick(student)}>
-                <div className="flex items-center space-x-3">
+              <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap cursor-pointer" onClick={() => onRowClick(student)}>
+                <div className="flex items-center space-x-2 sm:space-x-3">
                     <img 
                         src={student.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${student.name}`} 
                         alt={student.name} 
-                        className="w-8 h-8 rounded-full object-cover shadow-sm"
+                        className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover shadow-sm flex-shrink-0"
                     />
-                    <div>
-                        <div className="text-sm font-semibold text-gray-900">{student.name}</div>
-                        <div className="text-xs text-gray-500">{student.email}</div>
+                    <div className="min-w-0">
+                        <div className="text-xs sm:text-sm font-semibold text-gray-900 truncate">{student.name}</div>
+                        <div className="text-[10px] sm:text-xs text-gray-500 truncate">{student.email}</div>
                     </div>
                 </div>
               </td>
               {[studentStats.provaParana, studentStats.saeb, studentStats.provasInternas, studentStats.provasExternas, studentStats.frequencia, studentStats.plataformasDigitais].map((score, i) => {
                 const displayScore = score === null || typeof score === 'undefined' ? 0 : score;
                 return (
-                <td key={i} className="px-4 py-3.5 whitespace-nowrap cursor-pointer" onClick={() => onRowClick(student)}>
-                  <span className={`text-sm font-medium ${displayScore >= 70 ? 'text-emerald-700' : displayScore >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
+                <td key={i} className="px-2 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap cursor-pointer" onClick={() => onRowClick(student)}>
+                  <span className={`text-xs sm:text-sm font-medium ${displayScore >= 70 ? 'text-emerald-700' : displayScore >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
                     {displayScore}%
                   </span>
                 </td>
               )})}
-              <td className="px-4 py-3.5 whitespace-nowrap cursor-pointer" onClick={() => onRowClick(student)}>
-                <span className="text-sm font-bold text-blue-600">{calculateAverage(studentStats)}%</span>
+              <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap cursor-pointer" onClick={() => onRowClick(student)}>
+                <span className="text-xs sm:text-sm font-bold text-blue-600">{calculateAverage(studentStats)}%</span>
               </td>
-              <td className="px-4 py-3.5 whitespace-nowrap text-sm font-medium">
-                <div className="flex space-x-2">
+              <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap text-xs sm:text-sm font-medium">
+                <div className="flex space-x-1 sm:space-x-2">
                    <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => onRowClick(student)}
-                    className="text-sky-600 hover:bg-sky-100 hover:text-sky-700 transition-all"
+                    className="text-sky-600 hover:bg-sky-100 hover:text-sky-700 transition-all h-6 w-6 sm:h-8 sm:w-8 p-0"
                     title="Ver Detalhes"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => onEdit(student)}
-                    className="text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all"
+                    className="text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all h-6 w-6 sm:h-8 sm:w-8 p-0"
                     title="Editar Aluno"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => onDelete(student.id)}
-                    className="text-red-600 hover:bg-red-100 hover:text-red-700 transition-all"
+                    className="text-red-600 hover:bg-red-100 hover:text-red-700 transition-all h-6 w-6 sm:h-8 sm:w-8 p-0"
                     title="Remover Aluno"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 </div>
               </td>
