@@ -64,10 +64,10 @@ const MotivationalMessage = ({ score, name }) => {
 
 const MascotPrize = ({ userName, userRanking }) => {
   const mascotMessages = [
-    `Continue assim, ${userName}, e este notebook incrível pode ser seu! ✨`,
-    `Falta pouco, ${userName}! Mantenha o foco e conquiste este super prêmio! 💻`,
-    `Imagine só, ${userName}, todas as coisas que você poderá fazer com este notebook! 🚀`,
-    `Este notebook é um incentivo para você brilhar ainda mais, ${userName}! 🌟`
+    `Continue assim, ${userName}, e este prêmio misterioso pode ser seu! ✨`,
+    `Falta pouco, ${userName}! Mantenha o foco e conquiste este super prêmio! 🎁`,
+    `Imagine só, ${userName}, que surpresa incrível te espera nesta caixa! 🚀`,
+    `Este prêmio misterioso é um incentivo para você brilhar ainda mais, ${userName}! 🌟`
   ];
   const [currentMessage, setCurrentMessage] = useState(mascotMessages[0]);
 
@@ -88,11 +88,11 @@ const MascotPrize = ({ userName, userRanking }) => {
       <div className="text-center w-full">
         <h3 className="text-lg sm:text-2xl font-bold text-emerald-700 mb-1.5">Prêmio Final do Ano!</h3>
         <p className="text-gray-600 text-xs sm:text-sm mb-4">
-          O melhor aluno do 9º ano ganhará um <strong className="text-emerald-600">super notebook!</strong>
+          O melhor aluno do 9º ano ganhará um <strong className="text-emerald-600">prêmio misterioso!</strong>
         </p>
         <motion.img 
-          src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/afe9d6dd0519249cbc3144481b7f0413.png"
-          alt="Notebook - Prêmio final"
+          src="/image.png"
+          alt="Caixa surpresa - Prêmio misterioso"
           className="w-full max-w-[200px] sm:max-w-[260px] md:max-w-[280px] mx-auto mb-4 drop-shadow-[0_20px_30px_rgba(0,160,120,0.35)]"
           whileHover={{ scale: 1.05, rotate: 1.5 }}
           transition={{ type: "spring", stiffness: 250, damping: 10 }}
@@ -124,7 +124,7 @@ const MascotPrize = ({ userName, userRanking }) => {
         whileHover={{ scale: 1.02 }}
       >
         <p className="font-semibold text-xs sm:text-sm">
-          Sua Posição Atual: <span className="text-sm sm:text-lg font-bold tracking-wide">#{userRanking || "N/A"}</span>
+          Sua Posição Atual: <span className="text-sm sm:text-lg font-bold tracking-wide">#{userRanking || "Calculando..."}</span>
         </p>
         <p className="text-[10px] sm:text-xs text-emerald-100">Continue firme rumo ao topo!</p>
       </motion.div>

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import ReportCharts from '@/components/ReportCharts';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 const StatCard = ({ label, value, icon: Icon, color, description }) => (
   <motion.div
@@ -93,64 +92,134 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
 
       const pdf = new jsPDF();
       const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Header
+      // Header with school logo and info
       pdf.setFontSize(20);
       pdf.setFont(undefined, 'bold');
-      pdf.text('Relatório Acadêmico - 9º Ano', pageWidth / 2, 30, { align: 'center' });
+      pdf.text('RELATÓRIO ACADÊMICO - 9º ANO', pageWidth / 2, 30, { align: 'center' });
+      
+      pdf.setFontSize(14);
+      pdf.setFont(undefined, 'normal');
+      pdf.text('Escola Estadual do Campo Vinícius de Moraes', pageWidth / 2, 45, { align: 'center' });
       
       pdf.setFontSize(12);
-      pdf.setFont(undefined, 'normal');
-      pdf.text('Escola Estadual do Campo Vinícius de Moraes', pageWidth / 2, 40, { align: 'center' });
-      pdf.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth / 2, 50, { align: 'center' });
+      pdf.text(`Data de Geração: ${new Date().toLocaleDateString('pt-BR', { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}`, pageWidth / 2, 55, { align: 'center' });
 
-      // Statistics
-      let yPosition = 70;
+      // Add a line separator
+      pdf.setLineWidth(0.5);
+      pdf.line(20, 65, pageWidth - 20, 65);
+
+      // Statistics Section
+      let yPosition = 80;
       pdf.setFontSize(16);
       pdf.setFont(undefined, 'bold');
-      pdf.text('Estatísticas Gerais', 20, yPosition);
+      pdf.text('📊 ESTATÍSTICAS GERAIS', 20, yPosition);
       
-      yPosition += 20;
+      yPosition += 15;
       pdf.setFontSize(12);
       pdf.setFont(undefined, 'normal');
       
       const stats = [
-        `Total de Alunos: ${reportData.totalStudents}`,
-        `Média Geral da Turma: ${reportData.averageScore}%`,
-        `Taxa de Frequência: ${reportData.attendanceRate}%`,
-        `Notícias Publicadas: ${reportData.totalNews}`,
-        `Eventos Agendados: ${reportData.totalEvents}`,
+        `👥 Total de Alunos Cadastrados: ${reportData.totalStudents}`,
+        `📈 Média Geral da Turma: ${reportData.averageScore}%`,
+        `📅 Taxa de Frequência Média: ${reportData.attendanceRate}%`,
+        `📰 Notícias Publicadas: ${reportData.totalNews}`,
+        `🎉 Eventos Programados: ${reportData.totalEvents}`,
       ];
 
       stats.forEach(stat => {
-        pdf.text(stat, 20, yPosition);
+        pdf.text(stat, 25, yPosition);
+        yPosition += 12;
+      });
+
+      // Top Performer Section
+      if (reportData.topPerformer) {
+        yPosition += 10;
+        pdf.setFontSize(16);
+        pdf.setFont(undefined, 'bold');
+        pdf.text('🏆 DESTAQUE ACADÊMICO', 20, yPosition);
+        
+        yPosition += 15;
+        pdf.setFontSize(12);
+        pdf.setFont(undefined, 'normal');
+        pdf.text(`🌟 Melhor Desempenho: ${reportData.topPerformer.name}`, 25, yPosition);
+        yPosition += 10;
+        pdf.text(`📊 Média Geral: ${Math.round(reportData.topPerformer.averageScore || 0)}%`, 25, yPosition);
+      }
+
+      // Performance Distribution
+      yPosition += 20;
+      pdf.setFontSize(16);
+      pdf.setFont(undefined, 'bold');
+      pdf.text('📋 DISTRIBUIÇÃO DE DESEMPENHO', 20, yPosition);
+      
+      yPosition += 15;
+      pdf.setFontSize(11);
+      pdf.setFont(undefined, 'normal');
+      
+      const performanceRanges = [
+        { label: '🥇 Excelente (90-100%)', count: allStudents.filter(s => (s.averageScore || 0) >= 90).length },
+        { label: '🥈 Muito Bom (80-89%)', count: allStudents.filter(s => (s.averageScore || 0) >= 80 && (s.averageScore || 0) < 90).length },
+        { label: '🥉 Bom (70-79%)', count: allStudents.filter(s => (s.averageScore || 0) >= 70 && (s.averageScore || 0) < 80).length },
+        { label: '📚 Regular (60-69%)', count: allStudents.filter(s => (s.averageScore || 0) >= 60 && (s.averageScore || 0) < 70).length },
+        { label: '💪 Precisa Melhorar (<60%)', count: allStudents.filter(s => (s.averageScore || 0) < 60).length },
+      ];
+
+      performanceRanges.forEach(range => {
+        pdf.text(`${range.label}: ${range.count} alunos`, 25, yPosition);
         yPosition += 10;
       });
 
-      if (reportData.topPerformer) {
-        yPosition += 10;
-        pdf.setFont(undefined, 'bold');
-        pdf.text('Melhor Desempenho:', 20, yPosition);
-        yPosition += 10;
-        pdf.setFont(undefined, 'normal');
-        pdf.text(`${reportData.topPerformer.name} - ${Math.round(reportData.topPerformer.averageScore || 0)}%`, 20, yPosition);
-      }
-
       // Student List
       if (allStudents.length > 0) {
-        yPosition += 30;
+        yPosition += 15;
+        
+        // Check if we need a new page
+        if (yPosition > pageHeight - 60) {
+          pdf.addPage();
+          yPosition = 30;
+        }
+        
         pdf.setFontSize(16);
         pdf.setFont(undefined, 'bold');
-        pdf.text('Lista de Alunos', 20, yPosition);
+        pdf.text('👨‍🎓 LISTA COMPLETA DE ALUNOS', 20, yPosition);
         
-        yPosition += 20;
+        yPosition += 15;
         pdf.setFontSize(10);
         pdf.setFont(undefined, 'normal');
         
+        // Table headers
+        pdf.setFont(undefined, 'bold');
+        pdf.text('#', 25, yPosition);
+        pdf.text('Nome do Aluno', 35, yPosition);
+        pdf.text('Média', 120, yPosition);
+        pdf.text('Freq.', 145, yPosition);
+        pdf.text('Situação', 165, yPosition);
+        
+        yPosition += 8;
+        pdf.setFont(undefined, 'normal');
+        
         allStudents.forEach((student, index) => {
-          if (yPosition > 250) {
+          if (yPosition > pageHeight - 30) {
             pdf.addPage();
             yPosition = 30;
+            
+            // Repeat headers on new page
+            pdf.setFont(undefined, 'bold');
+            pdf.text('#', 25, yPosition);
+            pdf.text('Nome do Aluno', 35, yPosition);
+            pdf.text('Média', 120, yPosition);
+            pdf.text('Freq.', 145, yPosition);
+            pdf.text('Situação', 165, yPosition);
+            yPosition += 8;
+            pdf.setFont(undefined, 'normal');
           }
           
           const stats = student.stats || {};
@@ -159,22 +228,37 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
              (stats.provasExternas || 0) + (stats.plataformasDigitais || 0)) / 5
           );
           
-          pdf.text(`${index + 1}. ${student.name} - Média: ${average}% - Frequência: ${stats.frequencia || 0}%`, 20, yPosition);
+          const situation = average >= 70 ? 'Aprovado' : average >= 50 ? 'Recuperação' : 'Reforço';
+          
+          pdf.text(`${index + 1}`, 25, yPosition);
+          pdf.text(student.name.length > 25 ? student.name.substring(0, 25) + '...' : student.name, 35, yPosition);
+          pdf.text(`${average}%`, 120, yPosition);
+          pdf.text(`${stats.frequencia || 0}%`, 145, yPosition);
+          pdf.text(situation, 165, yPosition);
           yPosition += 8;
         });
       }
 
-      pdf.save(`relatorio-9ano-${new Date().toISOString().split('T')[0]}.pdf`);
+      // Footer
+      const footerY = pageHeight - 20;
+      pdf.setFontSize(8);
+      pdf.setFont(undefined, 'italic');
+      pdf.text('Relatório gerado automaticamente pelo Portal do 9º Ano', pageWidth / 2, footerY, { align: 'center' });
+      pdf.text(`© ${new Date().getFullYear()} Escola Estadual do Campo Vinícius de Moraes`, pageWidth / 2, footerY + 8, { align: 'center' });
+
+      // Save the PDF
+      const fileName = `relatorio-9ano-${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
       
       toast({
-        title: "Relatório Gerado!",
-        description: "O relatório PDF foi baixado com sucesso.",
+        title: "Relatório Gerado com Sucesso! 📄",
+        description: `O arquivo "${fileName}" foi baixado para seu computador.`,
       });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       toast({
         title: "Erro ao Gerar Relatório",
-        description: "Ocorreu um erro ao gerar o relatório PDF.",
+        description: "Ocorreu um erro ao gerar o relatório PDF. Tente novamente.",
         variant: "destructive",
       });
     }
@@ -281,7 +365,7 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
                   <div>Muito Bom (80-89%): {allStudents.filter(s => (s.averageScore || 0) >= 80 && (s.averageScore || 0) < 90).length} alunos</div>
                   <div>Bom (70-79%): {allStudents.filter(s => (s.averageScore || 0) >= 70 && (s.averageScore || 0) < 80).length} alunos</div>
                   <div>Regular (60-69%): {allStudents.filter(s => (s.averageScore || 0) >= 60 && (s.averageScore || 0) < 70).length} alunos</div>
-                  <div>Precisa Melhorar (&lt;60%): {allStudents.filter(s => (s.averageScore || 0) < 60).length} alunos</div>
+                  <div>Precisa Melhorar (<60%): {allStudents.filter(s => (s.averageScore || 0) < 60).length} alunos</div>
                 </div>
               </div>
               
