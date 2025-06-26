@@ -91,7 +91,7 @@ const MascotPrize = ({ userName, userRanking }) => {
           O melhor aluno do 9º ano ganhará um <strong className="text-emerald-600">prêmio misterioso!</strong>
         </p>
         <motion.img 
-          src="/image.png"
+          src="/ChatGPT Image 13 de jun. de 2025, 10_24_51 (1).png"
           alt="Caixa surpresa - Prêmio misterioso"
           className="w-full max-w-[200px] sm:max-w-[260px] md:max-w-[280px] mx-auto mb-4 drop-shadow-[0_20px_30px_rgba(0,160,120,0.35)]"
           whileHover={{ scale: 1.05, rotate: 1.5 }}
@@ -158,7 +158,7 @@ const FeedbackSection = () => {
         className="w-full bg-white/20 border-white/30 hover:bg-white/30 text-white backdrop-blur-sm shadow-md hover:shadow-lg transition-all text-xs sm:text-sm"
       >
         <a
-          href="https://docs.google.com/forms/d/e/1FAIpQLSeHytzhO-f4sx4kNLmGDV7pvexrnNkr2YoevrG8nvF18EZ7ow/viewform?usp=dialog"
+          href="https://docs.google.com/forms/d/e/1FAIpQLScy3mC1btAkuAtO4UNjGKpi5sQN6pK8S6cUoOVw18lVd5nEVg/viewform?usp=dialog"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center"
