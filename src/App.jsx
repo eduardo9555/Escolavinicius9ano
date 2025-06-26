@@ -58,7 +58,6 @@ function App() {
     'elainebfrod@gmail.com'
   ].map(email => email.toLowerCase());
 
-
   useEffect(() => {
     setIsLoading(true);
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
@@ -151,6 +150,7 @@ function App() {
     const unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
       const studentsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
       
+      // Calculate ranking based on average scores
       const rankedStudents = studentsList
         .map(student => {
           const stats = student.stats || {};
@@ -161,7 +161,8 @@ function App() {
             stats.provasExternas || 0,
             stats.plataformasDigitais || 0,
           ];
-          const averageScore = scores.reduce((sum, score) => sum + (Number(score) || 0), 0) / (scores.filter(s => typeof s === 'number' && !isNaN(s)).length || 1);
+          const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
+          const averageScore = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
           return {
             ...student,
             averageScore: Math.round(averageScore),
@@ -173,7 +174,13 @@ function App() {
             }
             return a.name.localeCompare(b.name);
         })
-        .map((student, index) => ({ ...student, stats: { ...student.stats, ranking: index + 1 } }));
+        .map((student, index) => ({ 
+          ...student, 
+          stats: { 
+            ...student.stats, 
+            ranking: index + 1 
+          } 
+        }));
       
       setAllStudents(rankedStudents);
 

@@ -63,7 +63,6 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
     }
   };
 
-
   useEffect(() => {
     setIsLoadingStats(true);
     
@@ -72,28 +71,40 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
     let totalScore = 0;
     let validStudentsForAverage = 0;
 
-    studentsList.forEach(student => {
+    // Calculate averages and find top student
+    const studentsWithAverages = studentsList.map(student => {
       if (student.stats) {
         const { provaParana = 0, saeb = 0, provasInternas = 0, provasExternas = 0, plataformasDigitais = 0 } = student.stats;
-        const studentAverage = (provaParana + saeb + provasInternas + provasExternas + plataformasDigitais) / 5;
+        const scores = [provaParana, saeb, provasInternas, provasExternas, plataformasDigitais];
+        const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
+        const studentAverage = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
+        
         if (!isNaN(studentAverage)) {
            totalScore += studentAverage;
            validStudentsForAverage++;
         }
+        
+        return { ...student, calculatedAverage: Math.round(studentAverage) };
       }
+      return { ...student, calculatedAverage: 0 };
     });
     
     const overallAverage = validStudentsForAverage > 0 ? Math.round(totalScore / validStudentsForAverage) : 0;
     setStats(prev => ({ ...prev, activeStudents: studentsList.length, averageScore: overallAverage }));
 
-    if (studentsList.length > 0) {
-        // The allStudents prop is already sorted by ranking (averageScore) in App.jsx
-        setTopStudent(studentsList[0]); // The first student is the top student
+    // Find top student based on calculated average
+    if (studentsWithAverages.length > 0) {
+        const sortedStudents = studentsWithAverages.sort((a, b) => {
+          if (b.calculatedAverage !== a.calculatedAverage) {
+            return b.calculatedAverage - a.calculatedAverage;
+          }
+          return a.name.localeCompare(b.name);
+        });
+        setTopStudent(sortedStudents[0]);
     } else {
       setTopStudent(null);
     }
     setIsLoadingStats(false);
-
 
     const newsUnsub = onSnapshot(query(collection(db, 'news')), async (snapshot) => {
       setStats(prev => ({ ...prev, publishedNews: snapshot.size }));
@@ -102,7 +113,6 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
     const eventsUnsub = onSnapshot(query(collection(db, 'events')), async (snapshot) => {
       setStats(prev => ({ ...prev, scheduledEvents: snapshot.size }));
     }, (error) => console.error("Error fetching events count:", error));
-
 
     return () => {
         newsUnsub();
@@ -129,7 +139,6 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
 
     return () => unsubscribeActivities();
   }, []);
-
 
   const welcomeMessages = [
     `Olá, ${currentAdminName}! Pronta para organizar o dia? 🗓️`,
@@ -251,7 +260,7 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
                   <p className="text-[10px] sm:text-xs opacity-80">1º Lugar Geral</p>
                   <p className="text-base sm:text-xl font-bold">{topStudent.name}</p>
                   <p className="text-xs sm:text-sm opacity-90">
-                    Média: {Math.round(topStudent.averageScore || 0)}%
+                    Média: {Math.round(topStudent.calculatedAverage || 0)}%
                   </p>
                 </div>
                 <Award className="w-8 h-8 sm:w-10 sm:h-10 ml-auto text-yellow-200 opacity-70" />
@@ -260,8 +269,6 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
                 <p className="text-gray-500 text-sm">Nenhum aluno no ranking ainda.</p>
             )}
           </div>
-
-
         </motion.div>
 
         <motion.div 

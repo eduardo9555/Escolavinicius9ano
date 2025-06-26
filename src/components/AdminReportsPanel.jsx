@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { FileSpreadsheet, Download, Printer, Users, BarChart3, TrendingUp, Calendar, FileText, Eye, AlertTriangle } from 'lucide-react';
+import { FileSpreadsheet, Download, Printer, Users, BarChart3, TrendingUp, Calendar, FileText, Eye, AlertTriangle, Trophy, Medal, Award } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import ReportCharts from '@/components/ReportCharts';
 import html2canvas from 'html2canvas';
@@ -16,7 +16,8 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
     totalNews: 0,
     totalEvents: 0,
     performanceDistribution: {},
-    subjectAverages: {}
+    subjectAverages: {},
+    rankingData: []
   });
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
     const totalStudents = allStudents.length;
     
     if (totalStudents > 0) {
-      // Calculate overall average
+      // Calculate overall average and ranking
       let totalScore = 0;
       let validStudentsForAverage = 0;
       
@@ -50,12 +51,23 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
         return { ...student, averageScore: Math.round(average) };
       });
       
+      // Sort students by average score for ranking
+      const rankedStudents = studentAverages
+        .sort((a, b) => {
+          if (b.averageScore !== a.averageScore) {
+            return b.averageScore - a.averageScore;
+          }
+          return a.name.localeCompare(b.name);
+        })
+        .map((student, index) => ({
+          ...student,
+          ranking: index + 1
+        }));
+      
       const overallAverage = validStudentsForAverage > 0 ? Math.round(totalScore / validStudentsForAverage) : 0;
       
       // Find top performer
-      const topPerformer = studentAverages.reduce((top, current) => 
-        (current.averageScore > (top?.averageScore || 0)) ? current : top, null
-      );
+      const topPerformer = rankedStudents[0] || null;
       
       // Performance distribution
       const distribution = {
@@ -82,7 +94,8 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
         totalNews: allNews.length,
         totalEvents: allEvents.length,
         performanceDistribution: distribution,
-        subjectAverages
+        subjectAverages,
+        rankingData: rankedStudents.slice(0, 10) // Top 10 for ranking display
       });
     } else {
       setReportData({
@@ -92,7 +105,8 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
         totalNews: allNews.length,
         totalEvents: allEvents.length,
         performanceDistribution: {},
-        subjectAverages: {}
+        subjectAverages: {},
+        rankingData: []
       });
     }
     
@@ -203,6 +217,13 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
     </motion.div>
   );
 
+  const getRankingIcon = (position) => {
+    if (position === 1) return <Trophy className="w-5 h-5 text-yellow-500" />;
+    if (position === 2) return <Medal className="w-5 h-5 text-gray-400" />;
+    if (position === 3) return <Award className="w-5 h-5 text-amber-600" />;
+    return <span className="text-sm font-bold text-gray-600">#{position}</span>;
+  };
+
   return (
     <div className="space-y-6 sm:space-y-8 p-4 md:p-6 bg-gradient-to-br from-slate-50 via-gray-50 to-stone-100 rounded-xl shadow-inner min-h-[calc(100vh-10rem)]">
       <motion.div
@@ -291,12 +312,48 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
           />
         </motion.div>
 
+        {/* Ranking Section */}
+        {reportData.rankingData.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 print:shadow-none print:border-gray-300"
+          >
+            <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-4 print:text-black flex items-center">
+              <Trophy className="w-6 h-6 mr-2 text-yellow-500" />
+              Top 10 - Ranking Geral
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              {reportData.rankingData.map((student, index) => (
+                <div key={student.id || index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg print:bg-gray-100">
+                  <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                    {getRankingIcon(student.ranking)}
+                  </div>
+                  <img 
+                    src={student.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${student.name}`}
+                    alt={student.name}
+                    className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 truncate print:text-black">{student.name}</p>
+                    <p className="text-xs text-gray-500 print:text-gray-700">Média: {student.averageScore}%</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-emerald-600 print:text-black">#{student.ranking}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Performance Distribution */}
         {reportData.totalStudents > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
             className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 print:shadow-none print:border-gray-300"
           >
             <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-4 print:text-black">Distribuição de Desempenho</h3>
@@ -316,7 +373,7 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
             className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 print:shadow-none print:border-gray-300"
           >
             <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-4 print:text-black">Médias por Área de Conhecimento</h3>

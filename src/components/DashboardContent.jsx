@@ -62,7 +62,7 @@ const MotivationalMessage = ({ score, name }) => {
   );
 };
 
-const MascotPrize = ({ userName, userRanking }) => {
+const MascotPrize = ({ userName, userRanking, totalStudents }) => {
   const mascotMessages = [
     `Continue assim, ${userName}, e este prêmio misterioso pode ser seu! ✨`,
     `Falta pouco, ${userName}! Mantenha o foco e conquiste este super prêmio! 🎁`,
@@ -77,6 +77,30 @@ const MascotPrize = ({ userName, userRanking }) => {
     }, 6000);
     return () => clearInterval(intervalId);
   }, [userName]);
+
+  // Determinar posição real do ranking
+  const getRankingDisplay = () => {
+    if (!userRanking || userRanking === 0) {
+      return "Sem posição";
+    }
+    return `#${userRanking}`;
+  };
+
+  const getRankingMessage = () => {
+    if (!userRanking || userRanking === 0) {
+      return "Continue estudando para entrar no ranking!";
+    }
+    
+    if (userRanking === 1) {
+      return "🏆 Você está em 1º lugar! Parabéns!";
+    } else if (userRanking <= 3) {
+      return `🥉 Você está no pódio! Posição ${userRanking}`;
+    } else if (userRanking <= Math.ceil(totalStudents * 0.3)) {
+      return "📈 Você está entre os melhores da turma!";
+    } else {
+      return "💪 Continue se esforçando para subir no ranking!";
+    }
+  };
 
   return (
     <motion.div
@@ -124,9 +148,9 @@ const MascotPrize = ({ userName, userRanking }) => {
         whileHover={{ scale: 1.02 }}
       >
         <p className="font-semibold text-xs sm:text-sm">
-          Sua Posição Atual: <span className="text-sm sm:text-lg font-bold tracking-wide">#{userRanking || "Calculando..."}</span>
+          Sua Posição Atual: <span className="text-sm sm:text-lg font-bold tracking-wide">{getRankingDisplay()}</span>
         </p>
-        <p className="text-[10px] sm:text-xs text-emerald-100">Continue firme rumo ao topo!</p>
+        <p className="text-[10px] sm:text-xs text-emerald-100">{getRankingMessage()}</p>
       </motion.div>
     </motion.div>
   );
@@ -176,7 +200,18 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
   const [welcomeMessage, setWelcomeMessage] = useState('');
 
   useEffect(() => {
-    setStudentData(user);
+    // Encontrar dados atualizados do estudante no allStudents
+    if (user.type === 'student' && allStudents && allStudents.length > 0) {
+      const updatedStudent = allStudents.find(s => s.id === user.uid || s.email === user.email);
+      if (updatedStudent) {
+        setStudentData(updatedStudent);
+      } else {
+        setStudentData(user);
+      }
+    } else {
+      setStudentData(user);
+    }
+
     const welcomeMessages = [
       `Olá, ${user.name}! Pronto para mais um dia de conquistas? ✨`,
       `Bem-vindo(a) de volta, ${user.name}! Que seu dia seja produtivo e cheio de aprendizado! 🚀`,
@@ -184,7 +219,7 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
       `Que bom te ver, ${user.name}! Continue se esforçando, você está no caminho certo! 🌟`
     ];
     setWelcomeMessage(welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)]);
-  }, [user]);
+  }, [user, allStudents]);
 
   if (user.type === 'admin') {
     return <AdminDashboard user={user} setActiveTab={setActiveTab} allStudents={allStudents} allNews={allNews} allEvents={allEvents} />;
@@ -329,7 +364,11 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
         </motion.div>
 
         <div className="lg:col-span-4">
-          <MascotPrize userName={user.name} userRanking={studentData?.stats?.ranking} />
+          <MascotPrize 
+            userName={user.name} 
+            userRanking={studentData?.stats?.ranking} 
+            totalStudents={allStudents?.length || 0}
+          />
         </div>
       </div>
 
