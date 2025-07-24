@@ -88,6 +88,8 @@ const LoginModal = ({ isOpen, onClose, onLogin, type, adminEmails, authorizedStu
         errorMessage = "Múltiplas janelas de login abertas. Tente novamente.";
       } else if (error.code === 'auth/network-request-failed') {
         errorMessage = "Erro de rede. Verifique sua conexão e tente novamente.";
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = "O popup de login foi bloqueado pelo navegador. Por favor, desabilite o bloqueador de popup para este site e tente novamente.";
       }
       toast({
         title: "Erro no Login",
