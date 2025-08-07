@@ -158,7 +158,7 @@ const NewsTab = ({ user }) => {
               >
                 {item.image && (
                   <div className="w-full hfull h-48 sm:h-56 overflow-hidden">
-                    <img-replace
+                    <img
                       src={item.image}
                       alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"

@@ -64,11 +64,18 @@ const AdminPanel = () => {
     setIsLoading(true);
     setFirestoreError(null);
     const usersCollectionRef = collection(db, 'users');
-    // This query requires a composite index on 'type' (asc) and 'name' (asc)
-    const q = query(usersCollectionRef, where("type", "==", "student"), orderBy("name"));
+    const q = query(usersCollectionRef, where("type", "==", "student"));
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const studentsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+      const studentsList = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return { 
+          id: docSnap.id, 
+          ...data,
+          email: data.email?.toLowerCase() || ''
+        };
+      }).sort((a, b) => a.name.localeCompare(b.name));
+      
       setStudents(studentsList);
       if (studentsList.length > 0 && (!selectedStudentForScores || !studentsList.find(s => s.id === selectedStudentForScores?.id))) {
         setSelectedStudentForScores(studentsList[0]);
@@ -79,8 +86,8 @@ const AdminPanel = () => {
       setFirestoreError(null); // Clear error on successful fetch
     }, (error) => {
       console.error("Erro ao buscar alunos: ", error);
-      setFirestoreError("Erro ao carregar alunos. Verifique se o índice do Firestore foi criado corretamente (type ASC, name ASC). Detalhes no console.");
-      toast({ title: "Erro ao carregar alunos", description: "Verifique o console para mais detalhes e se o índice do Firestore está configurado.", variant: "destructive" });
+      setFirestoreError("Erro ao carregar alunos. Detalhes no console.");
+      toast({ title: "Erro ao carregar alunos", description: "Verifique o console para mais detalhes.", variant: "destructive" });
       setIsLoading(false);
     });
     
@@ -91,7 +98,8 @@ const AdminPanel = () => {
   const handleFormSubmit = async (formDataFromForm) => {
     setIsLoading(true);
     const studentEmailDomain = "@escola.pr.gov.br";
-    if (!formDataFromForm.email.toLowerCase().endsWith(studentEmailDomain)) {
+    const emailToCheck = formDataFromForm.email.toLowerCase();
+    if (!emailToCheck.endsWith(studentEmailDomain)) {
         toast({
             title: "Email Inválido",
             description: `O email do aluno deve ser do domínio ${studentEmailDomain}.`,
@@ -103,7 +111,7 @@ const AdminPanel = () => {
 
     const dataToSubmit = {
       name: formDataFromForm.name,
-      email: formDataFromForm.email,
+      email: emailToCheck,
       type: 'student', 
       avatar: formDataFromForm.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${formDataFromForm.name}`,
       stats: {

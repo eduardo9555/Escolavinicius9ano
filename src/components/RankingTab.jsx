@@ -4,33 +4,11 @@ import { Trophy, Medal, Award, Star, TrendingUp, TrendingDown, CheckCircle } fro
 
 const RankingTab = ({ user, allStudents = [] }) => { 
   
-  const rankedStudentsToDisplay = allStudents
-    .map(student => {
-      const stats = student.stats || {};
-      const scores = [
-        stats.provaParana || 0,
-        stats.saeb || 0,
-        stats.provasInternas || 0,
-        stats.provasExternas || 0,
-        stats.plataformasDigitais || 0,
-      ];
-      const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
-      const averageScore = validScores.length > 0 ? 
-        Math.round(scores.reduce((sum, score) => sum + (Number(score) || 0), 0) / validScores.length) : 0;
-      
-      return {
-        ...student,
-        averageScore,
-        trend: ['up', 'down', 'stable'][Math.floor(Math.random() * 3)], 
-      };
-    })
-    .sort((a, b) => {
-      if (b.averageScore !== a.averageScore) {
-        return b.averageScore - a.averageScore;
-      }
-      // If average scores are the same, sort by name alphabetically
-      return a.name.localeCompare(b.name);
-    });
+  // Use the already ranked students from allStudents prop
+  const rankedStudentsToDisplay = allStudents.map(student => ({
+    ...student,
+    trend: student.stats?.trend || 'stable'
+  }));
 
   const getMedalColor = (position) => {
     if (position === 1) return "text-yellow-400";
@@ -179,7 +157,7 @@ const RankingTab = ({ user, allStudents = [] }) => {
                   <div>
                     <p className="font-semibold text-gray-800 text-sm sm:text-base flex items-center">
                       {student.name}
-                      {user && (student.id === user.uid || student.email === user.email) && (
+                user && (student.id === user.uid || student.uid === user.uid || student.email?.toLowerCase() === user.email?.toLowerCase()) ? 'bg-emerald-50 border-l-4 border-emerald-500' : 'hover:bg-gray-50'
                         <span className="ml-2 bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-medium">
                           Você
                         </span>
@@ -191,7 +169,7 @@ const RankingTab = ({ user, allStudents = [] }) => {
                 
                 <div className="flex items-center space-x-3 sm:space-x-4">
                   <div className="text-right">
-                    <p className="text-lg sm:text-xl font-bold text-emerald-600">{student.averageScore}%</p>
+                    {user && (student.id === user.uid || student.uid === user.uid || student.email?.toLowerCase() === user.email?.toLowerCase()) && (
                     <p className="text-gray-500 text-xs sm:text-sm">Média</p>
                   </div>
                   

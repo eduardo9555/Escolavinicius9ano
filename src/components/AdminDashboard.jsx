@@ -191,7 +191,7 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
           transition={{ delay: 0.2, duration: 0.6, type: "spring", stiffness: 120 }}
         >
           <motion.img 
-            src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/d3e82f464b6bd1fa35d02a534ff070fd.png"
+            src="/ChatGPT Image 13 de jun. de 2025, 10_24_51 (1).png"
             alt="Mascote da Secretaria"
             className="w-24 h-auto sm:w-28 md:w-32 drop-shadow-xl floating-animation"
           />

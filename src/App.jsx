@@ -6,7 +6,7 @@ import Dashboard from '@/components/Dashboard';
 import LoginModal from '@/components/LoginModal';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp, onSnapshot, collection, query, where, orderBy, limit } from "firebase/firestore";
+import { doc, setDoc, getDoc, serverTimestamp, onSnapshot, collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import AccessDeniedModal from '@/components/AccessDeniedModal';
 import StudentReportPage from '@/components/StudentReportPage';
 
@@ -89,45 +89,76 @@ function App() {
             localStorage.setItem(`firebaseUser_${authUser.uid}`, JSON.stringify(userData));
             setIsLoading(false);
           } else {
-            const newUserType = isPotentiallyAdmin ? 'admin' : 'student';
+            // Check if user already exists by email before creating new user
+            const checkExistingUser = async () => {
+              try {
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where("email", "==", authUser.email.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                  // User exists with this email, use existing data
+                  const existingUserDoc = querySnapshot.docs[0];
+                  const existingUserData = { uid: authUser.uid, id: existingUserDoc.id, ...existingUserDoc.data() };
+                  
+                  // Update the existing document with the new UID
+                  await setDoc(userDocRef, {
+                    ...existingUserData,
+                    uid: authUser.uid,
+                    updatedAt: serverTimestamp()
+                  });
+                  
+                  setCurrentUser(existingUserData);
+                  localStorage.setItem(`firebaseUser_${authUser.uid}`, JSON.stringify(existingUserData));
+                  setIsLoading(false);
+                  return;
+                }
+                
+                // No existing user found, create new one
+                const newUserType = isPotentiallyAdmin ? 'admin' : 'student';
 
-            if (newUserType === 'student' && !isAuthorizedStudent) {
-              setAccessDeniedMessage("Este email não está na lista de alunos autorizados. Contate a secretaria.");
-              setShowAccessDenied(true);
-              firebaseSignOut(auth).catch(e => console.error("Error signing out new student not authorized:", e));
-              setIsLoading(false);
-              return;
-            }
-            
-            const initialUserData = {
-              email: authUser.email,
-              name: authUser.displayName || authUser.email.split('@')[0],
-              avatar: authUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${authUser.displayName || authUser.email.split('@')[0]}`,
-              type: newUserType,
-              stats: {
-                ranking: 0, 
-                provaParana: Math.floor(Math.random() * 40) + 60,
-                provaParanaTrend: 'stable',
-                saeb: Math.floor(Math.random() * 40) + 60,
-                saebTrend: 'stable',
-                provasInternas: Math.floor(Math.random() * 30) + 70,
-                internasTrend: 'stable',
-                provasExternas: Math.floor(Math.random() * 35) + 65,
-                externasTrend: 'stable',
-                frequencia: Math.floor(Math.random() * 15) + 85,
-                frequenciaTrend: 'stable',
-                plataformasDigitais: Math.floor(Math.random() * 30) + 70,
-                plataformasDigitaisTrend: 'stable',
-              },
-              createdAt: serverTimestamp()
-            };
-            setDoc(userDocRef, initialUserData)
-              .then(() => {
+                if (newUserType === 'student' && !isAuthorizedStudent) {
+                  setAccessDeniedMessage("Este email não está na lista de alunos autorizados. Contate a secretaria.");
+                  setShowAccessDenied(true);
+                  firebaseSignOut(auth).catch(e => console.error("Error signing out new student not authorized:", e));
+                  setIsLoading(false);
+                  return;
+                }
+                
+                const initialUserData = {
+                  email: authUser.email.toLowerCase(),
+                  name: authUser.displayName || authUser.email.split('@')[0],
+                  avatar: authUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${authUser.displayName || authUser.email.split('@')[0]}`,
+                  type: newUserType,
+                  stats: {
+                    ranking: 0, 
+                    provaParana: 0,
+                    provaParanaTrend: 'stable',
+                    saeb: 0,
+                    saebTrend: 'stable',
+                    provasInternas: 0,
+                    internasTrend: 'stable',
+                    provasExternas: 0,
+                    externasTrend: 'stable',
+                    frequencia: 0,
+                    frequenciaTrend: 'stable',
+                    plataformasDigitais: 0,
+                    plataformasDigitaisTrend: 'stable',
+                  },
+                  createdAt: serverTimestamp()
+                };
+                
+                await setDoc(userDocRef, initialUserData);
                 setCurrentUser({ uid: authUser.uid, ...initialUserData });
                 localStorage.setItem(`firebaseUser_${authUser.uid}`, JSON.stringify({ uid: authUser.uid, ...initialUserData }));
-              })
-              .catch(e => console.error("Error creating user doc: ", e))
-              .finally(() => setIsLoading(false));
+                setIsLoading(false);
+              } catch (error) {
+                console.error("Error checking/creating user: ", error);
+                setIsLoading(false);
+              }
+            };
+            
+            checkExistingUser();
           }
         }, (error) => {
           console.error("Error listening to user document: ", error);
@@ -148,7 +179,14 @@ function App() {
     const studentsCollectionRef = collection(db, 'users');
     const qStudents = query(studentsCollectionRef, where("type", "==", "student"));
     const unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
-      const studentsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+      const studentsList = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return { 
+          id: docSnap.id, 
+          ...data,
+          email: data.email?.toLowerCase() || ''
+        };
+      });
       
       // Calculate ranking based on average scores
       const rankedStudents = studentsList
@@ -186,7 +224,11 @@ function App() {
 
       // Update currentUser's ranking if they are in the list
       if (auth.currentUser && auth.currentUser.uid) {
-        const currentUserInRankedList = rankedStudents.find(s => s.id === auth.currentUser.uid);
+        const currentUserInRankedList = rankedStudents.find(s => 
+          s.id === auth.currentUser.uid || 
+          s.uid === auth.currentUser.uid ||
+          s.email === auth.currentUser.email?.toLowerCase()
+        );
         if (currentUserInRankedList) {
           setCurrentUser(prevUser => {
             if (prevUser && prevUser.uid === auth.currentUser.uid) {

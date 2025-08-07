@@ -189,7 +189,7 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)}></div>
+                src="/google-logo.svg"
               <motion.nav 
                 className="fixed left-0 top-0 bottom-0 w-60 sm:w-72 bg-white shadow-2xl p-4 sm:p-5 space-y-2 border-r-2 border-emerald-100 flex flex-col"
                 initial={{ x: "-100%" }}
@@ -199,7 +199,7 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
               >
                 <div className="flex justify-between items-center mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-gray-200">
                     <img 
-                        src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/fabd3a46ec76ba6fff9fec1d4c650677.jpg"
+                        src="/google-logo.svg"
                         alt="Logo Escola Mobile"
                         className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
                     />

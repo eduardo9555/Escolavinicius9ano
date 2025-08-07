@@ -198,7 +198,7 @@ const AdminNewsPanel = ({ isStudentView = false }) => {
               >
                 {item.image && (
                   <div className="w-full h-48 sm:h-56 overflow-hidden rounded-t-xl">
-                    <img-replace
+                    <img
                       src={item.image}
                       alt={item.title}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
