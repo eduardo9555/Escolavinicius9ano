@@ -296,7 +296,7 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
             transition={{ delay: 1, duration: 0.5, ease: "easeOut" }}
             className="bg-gradient-to-tr from-emerald-500 to-green-600 rounded-xl p-3 sm:p-4 text-white shadow-lg text-center card-hover"
           >
-             src="/ChatGPT Image 13 de jun. de 2025, 10_24_51 (1).png"
+            <div className="flex items-center justify-center space-x-2 sm:space-x-3">
               <motion.img
                 src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/d3e82f464b6bd1fa35d02a534ff070fd.png"
                 alt="Mascote da escola" 
