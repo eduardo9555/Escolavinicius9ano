@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LogOut, Bell, Home, Users, FileText, Award, Newspaper, CalendarDays, X, Menu, FileSpreadsheet } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import DashboardContent from '@/components/DashboardContent';
 import RankingTab from '@/components/RankingTab';
 import AdminPanel from '@/components/AdminPanel';
@@ -9,6 +10,7 @@ import AdminNewsPanel from '@/components/AdminNewsPanel';
 import AdminEventsPanel from '@/components/AdminEventsPanel';
 import NotificationDropdown from '@/components/NotificationDropdown';
 import AdminReportsPanel from '@/components/AdminReportsPanel';
+import ChatTab from '@/components/ChatTab';
 
 const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenReport }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -23,6 +25,7 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
   const studentTabs = [
     ...commonTabsBase,
     { id: 'ranking', label: 'Ranking Geral', icon: Award },
+    { id: 'chat', label: 'Perguntas', icon: MessageCircle },
   ];
   
   const adminTabsSpecific = [
@@ -57,6 +60,8 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
         return <AdminNewsPanel user={user} isStudentView={user.type === 'student'} />;
       case 'events':
         return <AdminEventsPanel user={user} isStudentView={user.type === 'student'} />; 
+      case 'chat':
+        return user.type === 'student' ? <ChatTab user={user} /> : null;
       case 'adminStudents':
         return user.type === 'admin' ? <AdminPanel /> : null;
       case 'adminNews':

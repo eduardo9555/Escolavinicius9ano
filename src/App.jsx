@@ -9,6 +9,7 @@ import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp, onSnapshot, collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import AccessDeniedModal from '@/components/AccessDeniedModal';
 import StudentReportPage from '@/components/StudentReportPage';
+import { supabase } from '@/lib/supabase';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -22,6 +23,7 @@ function App() {
   const [allEvents, setAllEvents] = useState([]);
   const [showReportPage, setShowReportPage] = useState(false);
   const [studentForReport, setStudentForReport] = useState(null);
+  const [useSupabase, setUseSupabase] = useState(false);
 
   const adminEmails = [
     'izafantin26@gmail.com',
@@ -59,6 +61,74 @@ function App() {
   ].map(email => email.toLowerCase());
 
   useEffect(() => {
+    // Verificar se deve usar Supabase
+    const shouldUseSupabase = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
+    setUseSupabase(shouldUseSupabase);
+    
+    if (shouldUseSupabase) {
+      // Lógica do Supabase
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session?.user) {
+          const userEmailLower = session.user.email.toLowerCase();
+          const isPotentiallyAdmin = adminEmails.includes(userEmailLower);
+          const isAuthorizedStudent = authorizedStudentEmails.includes(userEmailLower);
+
+          if (!isPotentiallyAdmin && !isAuthorizedStudent) {
+            setAccessDeniedMessage("Seu email não está autorizado para acessar este portal. Entre em contato com a secretaria.");
+            setShowAccessDenied(true);
+            await supabase.auth.signOut();
+            setIsLoading(false);
+            return;
+          }
+
+          // Buscar ou criar perfil no Supabase
+          let { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+
+          if (error && error.code === 'PGRST116') {
+            // Perfil não existe, criar novo
+            const newUserType = isPotentiallyAdmin ? 'admin' : 'student';
+            const { data: newProfile, error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                user_id: session.user.id,
+                email: userEmailLower,
+                name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
+                avatar: session.user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${session.user.email.split('@')[0]}`,
+                type: newUserType
+              })
+              .select()
+              .single();
+
+            if (insertError) {
+              console.error("Error creating profile:", insertError);
+              setIsLoading(false);
+              return;
+            }
+            profile = newProfile;
+          }
+
+          setCurrentUser({
+            uid: session.user.id,
+            email: session.user.email,
+            name: profile.name,
+            avatar: profile.avatar,
+            type: profile.type,
+            stats: profile.stats
+          });
+        } else {
+          setCurrentUser(null);
+        }
+        setIsLoading(false);
+      });
+
+      return () => subscription.unsubscribe();
+    }
+    
+    // Lógica original do Firebase (mantida como fallback)
     setIsLoading(true);
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
@@ -270,14 +340,21 @@ function App() {
 
     return () => {
       unsubscribeAuth();
-      unsubscribeStudents();
-      unsubscribeNews();
-      unsubscribeEvents();
+      if (!useSupabase) {
+        unsubscribeStudents();
+        unsubscribeNews();
+        unsubscribeEvents();
+      }
       clearTimeout(timer);
     };
-  }, []); // Removed currentUser?.uid dependency to allow initial fetch
+  }, []);
 
   const handleLogin = (userDataFromModal, isFirebaseLogin = false) => {
+    if (useSupabase) {
+      // Login será tratado pelo Supabase Auth
+      return;
+    }
+    
     const userEmailLower = userDataFromModal.email.toLowerCase();
 
     if (userDataFromModal.type === 'unauthorized') { 
@@ -305,11 +382,15 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      const userToClearUID = auth.currentUser?.uid;
-      await firebaseSignOut(auth);
-      if (userToClearUID) {
-        localStorage.removeItem(`firebaseUser_${userToClearUID}`);
-        localStorage.removeItem(`viewedNotifications_${userToClearUID}`);
+      if (useSupabase) {
+        await supabase.auth.signOut();
+      } else {
+        const userToClearUID = auth.currentUser?.uid;
+        await firebaseSignOut(auth);
+        if (userToClearUID) {
+          localStorage.removeItem(`firebaseUser_${userToClearUID}`);
+          localStorage.removeItem(`viewedNotifications_${userToClearUID}`);
+        }
       }
       setCurrentUser(null); 
     } catch (error) {
