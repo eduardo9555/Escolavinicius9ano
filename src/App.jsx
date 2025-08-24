@@ -61,72 +61,9 @@ function App() {
   ].map(email => email.toLowerCase());
 
   useEffect(() => {
-    // Verificar se deve usar Supabase
-    const shouldUseSupabase = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
-    setUseSupabase(shouldUseSupabase);
-    
-    if (shouldUseSupabase) {
-      // Lógica do Supabase
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) {
-          const userEmailLower = session.user.email.toLowerCase();
-          const isPotentiallyAdmin = adminEmails.includes(userEmailLower);
-          const isAuthorizedStudent = authorizedStudentEmails.includes(userEmailLower);
-
-          if (!isPotentiallyAdmin && !isAuthorizedStudent) {
-            setAccessDeniedMessage("Seu email não está autorizado para acessar este portal. Entre em contato com a secretaria.");
-            setShowAccessDenied(true);
-            await supabase.auth.signOut();
-            setIsLoading(false);
-            return;
-          }
-
-          // Buscar ou criar perfil no Supabase
-          let { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-
-          if (error && error.code === 'PGRST116') {
-            // Perfil não existe, criar novo
-            const newUserType = isPotentiallyAdmin ? 'admin' : 'student';
-            const { data: newProfile, error: insertError } = await supabase
-              .from('profiles')
-              .insert({
-                user_id: session.user.id,
-                email: userEmailLower,
-                name: session.user.user_metadata?.full_name || session.user.email.split('@')[0],
-                avatar: session.user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${session.user.email.split('@')[0]}`,
-                type: newUserType
-              })
-              .select()
-              .single();
-
-            if (insertError) {
-              console.error("Error creating profile:", insertError);
-              setIsLoading(false);
-              return;
-            }
-            profile = newProfile;
-          }
-
-          setCurrentUser({
-            uid: session.user.id,
-            email: session.user.email,
-            name: profile.name,
-            avatar: profile.avatar,
-            type: profile.type,
-            stats: profile.stats
-          });
-        } else {
-          setCurrentUser(null);
-        }
-        setIsLoading(false);
-      });
-
-      return () => subscription.unsubscribe();
-    }
+    // Forçar uso do Firebase ao invés do Supabase
+    const shouldUseSupabase = false;
+    setUseSupabase(false);
     
     // Lógica original do Firebase (mantida como fallback)
     setIsLoading(true);
@@ -246,106 +183,96 @@ function App() {
       }
     });
 
-    // Only set up Firebase listeners if not using Supabase
-    if (!shouldUseSupabase) {
-      let unsubscribeStudents, unsubscribeNews, unsubscribeEvents;
-      
-      const studentsCollectionRef = collection(db, 'users');
-      const qStudents = query(studentsCollectionRef, where("type", "==", "student"));
-      unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
-        const studentsList = querySnapshot.docs.map(docSnap => {
-          const data = docSnap.data();
-          return { 
-            id: docSnap.id, 
-            ...data,
-            email: data.email?.toLowerCase() || ''
-          };
-        });
-        
-        // Calculate ranking based on average scores
-        const rankedStudents = studentsList
-          .map(student => {
-            const stats = student.stats || {};
-            const scores = [
-              stats.provaParana || 0,
-              stats.saeb || 0,
-              stats.provasInternas || 0,
-              stats.provasExternas || 0,
-              stats.plataformasDigitais || 0,
-            ];
-            const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
-            const averageScore = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
-            return {
-              ...student,
-              averageScore: Math.round(averageScore),
-            };
-          })
-          .sort((a, b) => {
-              if (b.averageScore !== a.averageScore) {
-                  return b.averageScore - a.averageScore;
-              }
-              return a.name.localeCompare(b.name);
-          })
-          .map((student, index) => ({ 
-            ...student, 
-            stats: { 
-              ...student.stats, 
-              ranking: index + 1 
-            } 
-          }));
-        
-        setAllStudents(rankedStudents);
-
-        // Update currentUser's ranking if they are in the list
-        if (auth.currentUser && auth.currentUser.uid) {
-          const currentUserInRankedList = rankedStudents.find(s => 
-            s.id === auth.currentUser.uid || 
-            s.uid === auth.currentUser.uid ||
-            s.email === auth.currentUser.email?.toLowerCase()
-          );
-          if (currentUserInRankedList) {
-            setCurrentUser(prevUser => {
-              if (prevUser && prevUser.uid === auth.currentUser.uid) {
-                const updatedUser = {
-                  ...prevUser,
-                  stats: {
-                    ...prevUser.stats,
-                    ranking: currentUserInRankedList.stats.ranking
-                  }
-                };
-                localStorage.setItem(`firebaseUser_${auth.currentUser.uid}`, JSON.stringify(updatedUser));
-                return updatedUser;
-              }
-              return prevUser;
-            });
-          }
-        }
-      }, (error) => {
-        console.error("Error fetching students for App.jsx:", error);
+    // Configurar listeners do Firebase
+    let unsubscribeStudents, unsubscribeNews, unsubscribeEvents;
+    
+    const studentsCollectionRef = collection(db, 'users');
+    const qStudents = query(studentsCollectionRef, where("type", "==", "student"));
+    unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
+      const studentsList = querySnapshot.docs.map(docSnap => {
+        const data = docSnap.data();
+        return { 
+          id: docSnap.id, 
+          ...data,
+          email: data.email?.toLowerCase() || ''
+        };
       });
+      
+      // Calculate ranking based on average scores
+      const rankedStudents = studentsList
+        .map(student => {
+          const stats = student.stats || {};
+          const scores = [
+            stats.provaParana || 0,
+            stats.saeb || 0,
+            stats.provasInternas || 0,
+            stats.provasExternas || 0,
+            stats.plataformasDigitais || 0,
+          ];
+          const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
+          const averageScore = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
+          return {
+            ...student,
+            averageScore: Math.round(averageScore),
+          };
+        })
+        .sort((a, b) => {
+            if (b.averageScore !== a.averageScore) {
+                return b.averageScore - a.averageScore;
+            }
+            return a.name.localeCompare(b.name);
+        })
+        .map((student, index) => ({ 
+          ...student, 
+          stats: { 
+            ...student.stats, 
+            ranking: index + 1 
+          } 
+        }));
+      
+      setAllStudents(rankedStudents);
 
-      const newsCollectionRef = collection(db, 'news');
-      const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(5));
-      unsubscribeNews = onSnapshot(qNews, (querySnapshot) => {
-        const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        setAllNews(newsList);
-      }, (error) => console.error("Error fetching news for App.jsx:", error));
-      
-      const eventsCollectionRef = collection(db, 'events');
-      const qEvents = query(eventsCollectionRef, orderBy("date", "desc"), limit(5));
-      unsubscribeEvents = onSnapshot(qEvents, (querySnapshot) => {
-        const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        setAllEvents(eventsList);
-      }, (error) => console.error("Error fetching events for App.jsx:", error));
-      
-      return () => {
-        unsubscribeAuth();
-        unsubscribeStudents?.();
-        unsubscribeNews?.();
-        unsubscribeEvents?.();
-        clearTimeout(timer);
-      };
-    }
+      // Update currentUser's ranking if they are in the list
+      if (auth.currentUser && auth.currentUser.uid) {
+        const currentUserInRankedList = rankedStudents.find(s => 
+          s.id === auth.currentUser.uid || 
+          s.uid === auth.currentUser.uid ||
+          s.email === auth.currentUser.email?.toLowerCase()
+        );
+        if (currentUserInRankedList) {
+          setCurrentUser(prevUser => {
+            if (prevUser && prevUser.uid === auth.currentUser.uid) {
+              const updatedUser = {
+                ...prevUser,
+                stats: {
+                  ...prevUser.stats,
+                  ranking: currentUserInRankedList.stats.ranking
+                }
+              };
+              localStorage.setItem(`firebaseUser_${auth.currentUser.uid}`, JSON.stringify(updatedUser));
+              return updatedUser;
+            }
+            return prevUser;
+          });
+        }
+      }
+    }, (error) => {
+      console.error("Error fetching students for App.jsx:", error);
+    });
+
+    const newsCollectionRef = collection(db, 'news');
+    const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(5));
+    unsubscribeNews = onSnapshot(qNews, (querySnapshot) => {
+      const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+      setAllNews(newsList);
+    }, (error) => console.error("Error fetching news for App.jsx:", error));
+    
+    const eventsCollectionRef = collection(db, 'events');
+    const qEvents = query(eventsCollectionRef, orderBy("date", "desc"), limit(5));
+    unsubscribeEvents = onSnapshot(qEvents, (querySnapshot) => {
+      const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+      setAllEvents(eventsList);
+    }, (error) => console.error("Error fetching events for App.jsx:", error));
     
     const timer = setTimeout(() => {
       if (isLoading && !currentUser) setIsLoading(false);
@@ -353,16 +280,14 @@ function App() {
 
     return () => {
       unsubscribeAuth();
+      unsubscribeStudents?.();
+      unsubscribeNews?.();
+      unsubscribeEvents?.();
       clearTimeout(timer);
     };
   }, []);
 
   const handleLogin = (userDataFromModal, isFirebaseLogin = false) => {
-    if (useSupabase) {
-      // Login será tratado pelo Supabase Auth
-      return;
-    }
-    
     const userEmailLower = userDataFromModal.email.toLowerCase();
 
     if (userDataFromModal.type === 'unauthorized') { 
@@ -390,15 +315,11 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      if (useSupabase) {
-        await supabase.auth.signOut();
-      } else {
-        const userToClearUID = auth.currentUser?.uid;
-        await firebaseSignOut(auth);
-        if (userToClearUID) {
-          localStorage.removeItem(`firebaseUser_${userToClearUID}`);
-          localStorage.removeItem(`viewedNotifications_${userToClearUID}`);
-        }
+      const userToClearUID = auth.currentUser?.uid;
+      await firebaseSignOut(auth);
+      if (userToClearUID) {
+        localStorage.removeItem(`firebaseUser_${userToClearUID}`);
+        localStorage.removeItem(`viewedNotifications_${userToClearUID}`);
       }
       setCurrentUser(null); 
     } catch (error) {
