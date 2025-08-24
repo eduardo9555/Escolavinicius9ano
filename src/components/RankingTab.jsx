@@ -191,7 +191,11 @@ const RankingTab = ({ user, allStudents, isAdminView = false }) => {
        (b.stats.provasExternas || 0) +
        (b.stats.plataformasDigitais || 0)) / 5
     ) : 0;
-    return avgB - avgA;
+    
+    if (avgB !== avgA) {
+      return avgB - avgA;
+    }
+    return a.name.localeCompare(b.name);
   }) : [];
 
   const topThree = sortedStudents.slice(0, 3);

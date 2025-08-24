@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { LogOut, Bell, Home, Users, FileText, Award, Newspaper, CalendarDays, X, Menu, FileSpreadsheet } from 'lucide-react';
-import { MessageCircle } from 'lucide-react';
+import { LogOut, Bell, Home, Users, FileText, Award, X, Menu, FileSpreadsheet } from 'lucide-react';
 import DashboardContent from '@/components/DashboardContent';
 import RankingTab from '@/components/RankingTab';
 import AdminPanel from '@/components/AdminPanel';
@@ -10,7 +9,6 @@ import AdminNewsPanel from '@/components/AdminNewsPanel';
 import AdminEventsPanel from '@/components/AdminEventsPanel';
 import NotificationDropdown from '@/components/NotificationDropdown';
 import AdminReportsPanel from '@/components/AdminReportsPanel';
-import ChatTab from '@/components/ChatTab';
 
 const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenReport }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -28,6 +26,8 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
   const adminTabsSpecific = [
     { id: 'adminStudents', label: 'Gerenciar Alunos', icon: Users },
     { id: 'adminRanking', label: 'Ranking Geral', icon: Award },
+    { id: 'adminNews', label: 'Gerenciar Notícias', icon: FileText },
+    { id: 'adminEvents', label: 'Gerenciar Eventos', icon: FileText },
     { id: 'adminReports', label: 'Relatórios', icon: FileSpreadsheet },
   ];
 
@@ -56,6 +56,10 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
       case 'adminRanking':
         console.log('Rendering RankingTab for admin with allStudents:', allStudents);
         return user.type === 'admin' ? <RankingTab user={user} allStudents={allStudents} isAdminView={true} /> : null;
+      case 'adminNews':
+        return user.type === 'admin' ? <AdminNewsPanel /> : null;
+      case 'adminEvents':
+        return user.type === 'admin' ? <AdminEventsPanel user={user} /> : null;
       case 'adminReports':
         return user.type === 'admin' ? <AdminReportsPanel allStudents={allStudents} allNews={allNews} allEvents={allEvents} /> : null;
       default:
