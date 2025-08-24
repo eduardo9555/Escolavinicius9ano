@@ -247,9 +247,9 @@ function App() {
     });
 
     // Only set up Firebase listeners if not using Supabase
-    let unsubscribeStudents, unsubscribeNews, unsubscribeEvents;
-    
     if (!shouldUseSupabase) {
+      let unsubscribeStudents, unsubscribeNews, unsubscribeEvents;
+      
       const studentsCollectionRef = collection(db, 'users');
       const qStudents = query(studentsCollectionRef, where("type", "==", "student"));
       unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
@@ -337,18 +337,22 @@ function App() {
         const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
         setAllEvents(eventsList);
       }, (error) => console.error("Error fetching events for App.jsx:", error));
+      
+      return () => {
+        unsubscribeAuth();
+        unsubscribeStudents?.();
+        unsubscribeNews?.();
+        unsubscribeEvents?.();
+        clearTimeout(timer);
+      };
     }
+    
     const timer = setTimeout(() => {
       if (isLoading && !currentUser) setIsLoading(false);
     }, 3500);
 
     return () => {
       unsubscribeAuth();
-      if (!shouldUseSupabase) {
-        unsubscribeStudents?.();
-        unsubscribeNews?.();
-        unsubscribeEvents?.();
-      }
       clearTimeout(timer);
     };
   }, []);
