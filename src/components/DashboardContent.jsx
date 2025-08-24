@@ -308,7 +308,7 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
           >
             <div className="flex items-center justify-center space-x-2 sm:space-x-3">
               <motion.img
-                src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/d3e82f464b6bd1fa35d02a534ff070fd.png"
+                src="https://i.postimg.cc/RFS1mcTK/image.png"
                 alt="Mascote da escola" 
                 className="w-12 h-12 sm:w-16 sm:h-16 object-contain drop-shadow-lg"
                 animate={{ rotate: [0, 3, -3, 0], scale: [1, 1.03, 1] }}
