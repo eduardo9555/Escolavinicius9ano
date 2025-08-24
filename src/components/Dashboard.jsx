@@ -85,7 +85,7 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
                 onClick={() => setActiveTab('dashboard')}
               >
                 <img 
-                  src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/fabd3a46ec76ba6fff9fec1d4c650677.jpg"
+                  src="https://i.postimg.cc/gJKWXPR1/image.png"
                   alt="Logo da Escola"
                   className="w-5 h-5 sm:w-7 sm:h-7 lg:w-9 lg:h-9 object-contain rounded-full p-0.5 bg-white"
                 />
