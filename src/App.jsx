@@ -80,6 +80,10 @@ function App() {
     
     // Lógica original do Firebase (mantida como fallback)
     setIsLoading(true);
+    
+    // Declare unsubscribe functions
+    let unsubscribeStudents, unsubscribeNews, unsubscribeEvents;
+    
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         const userEmailLower = authUser.email.toLowerCase();
@@ -93,6 +97,109 @@ function App() {
           setIsLoading(false);
           return;
         }
+
+        // Set up Firestore listeners only when user is authenticated
+        const studentsCollectionRef = collection(db, 'users');
+        const qStudents = query(studentsCollectionRef, where("type", "==", "student"));
+        unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
+          const studentsList = querySnapshot.docs.map(docSnap => {
+            const data = docSnap.data();
+            return { 
+              id: docSnap.id, 
+              ...data,
+              email: data.email?.toLowerCase() || ''
+            };
+          });
+          
+          // Calculate ranking based on average scores
+          const rankedStudents = studentsList
+            .map(student => {
+              const stats = student.stats || {};
+              const scores = [
+                stats.provaParana || 0,
+                stats.saeb || 0,
+                stats.provasInternas || 0,
+                stats.provasExternas || 0,
+                stats.plataformasDigitais || 0,
+              ];
+              const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
+              const averageScore = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
+              return {
+                ...student,
+                averageScore: Math.round(averageScore),
+              };
+            })
+            .sort((a, b) => {
+                if (b.averageScore !== a.averageScore) {
+                    return b.averageScore - a.averageScore;
+                }
+                return a.name.localeCompare(b.name);
+            })
+            .map((student, index) => ({ 
+              ...student, 
+              stats: { 
+                ...student.stats, 
+                ranking: index + 1 
+              } 
+            }));
+          
+          setAllStudents(rankedStudents);
+
+          // Update currentUser's ranking if they are in the list
+          if (authUser && authUser.uid) {
+            const currentUserInRankedList = rankedStudents.find(s => 
+              s.id === authUser.uid || 
+              s.uid === authUser.uid ||
+              s.email === authUser.email?.toLowerCase()
+            );
+            if (currentUserInRankedList) {
+              setCurrentUser(prevUser => {
+                if (prevUser && prevUser.uid === authUser.uid) {
+                  const updatedUser = {
+                    ...prevUser,
+                    stats: {
+                      ...prevUser.stats,
+                      ranking: currentUserInRankedList.stats.ranking
+                    }
+                  };
+                  localStorage.setItem(`firebaseUser_${authUser.uid}`, JSON.stringify(updatedUser));
+                  return updatedUser;
+                }
+                return prevUser;
+              });
+            }
+          }
+        }, (error) => {
+          console.error("Error fetching students for App.jsx:", error);
+        });
+
+        const newsCollectionRef = collection(db, 'news');
+        const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(5));
+        unsubscribeNews = onSnapshot(qNews, 
+          (querySnapshot) => {
+            const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            setAllNews(newsList);
+          }, 
+          (error) => {
+            console.error("Error fetching news for App.jsx:", error);
+            // Set empty array on error to prevent app crash
+            setAllNews([]);
+          }
+        );
+        
+        const eventsCollectionRef = collection(db, 'events');
+        const qEvents = query(eventsCollectionRef, orderBy("date", "desc"), limit(5));
+        unsubscribeEvents = onSnapshot(qEvents, 
+          (querySnapshot) => {
+            const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            setAllEvents(eventsList);
+          }, 
+          (error) => {
+            console.error("Error fetching events for App.jsx:", error);
+            // Set empty array on error to prevent app crash
+            setAllEvents([]);
+          }
+        );
 
         const userDocRef = doc(db, 'users', authUser.uid);
         const unsubscribeSnapshot = onSnapshot(userDocRef, (docSnap) => {
@@ -186,6 +293,16 @@ function App() {
         });
         return () => unsubscribeSnapshot();
       } else {
+        // Clean up Firestore listeners when user logs out
+        unsubscribeStudents?.();
+        unsubscribeNews?.();
+        unsubscribeEvents?.();
+        
+        // Reset data arrays
+        setAllStudents([]);
+        setAllNews([]);
+        setAllEvents([]);
+        
         setCurrentUser(null);
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('firebaseUser_')) {
@@ -196,111 +313,6 @@ function App() {
       }
     });
 
-    // Configurar listeners do Firebase
-    let unsubscribeStudents, unsubscribeNews, unsubscribeEvents;
-    
-    const studentsCollectionRef = collection(db, 'users');
-    const qStudents = query(studentsCollectionRef, where("type", "==", "student"));
-    unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
-      const studentsList = querySnapshot.docs.map(docSnap => {
-        const data = docSnap.data();
-        return { 
-          id: docSnap.id, 
-          ...data,
-          email: data.email?.toLowerCase() || ''
-        };
-      });
-      
-      // Calculate ranking based on average scores
-      const rankedStudents = studentsList
-        .map(student => {
-          const stats = student.stats || {};
-          const scores = [
-            stats.provaParana || 0,
-            stats.saeb || 0,
-            stats.provasInternas || 0,
-            stats.provasExternas || 0,
-            stats.plataformasDigitais || 0,
-          ];
-          const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
-          const averageScore = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
-          return {
-            ...student,
-            averageScore: Math.round(averageScore),
-          };
-        })
-        .sort((a, b) => {
-            if (b.averageScore !== a.averageScore) {
-                return b.averageScore - a.averageScore;
-            }
-            return a.name.localeCompare(b.name);
-        })
-        .map((student, index) => ({ 
-          ...student, 
-          stats: { 
-            ...student.stats, 
-            ranking: index + 1 
-          } 
-        }));
-      
-      setAllStudents(rankedStudents);
-
-      // Update currentUser's ranking if they are in the list
-      if (auth.currentUser && auth.currentUser.uid) {
-        const currentUserInRankedList = rankedStudents.find(s => 
-          s.id === auth.currentUser.uid || 
-          s.uid === auth.currentUser.uid ||
-          s.email === auth.currentUser.email?.toLowerCase()
-        );
-        if (currentUserInRankedList) {
-          setCurrentUser(prevUser => {
-            if (prevUser && prevUser.uid === auth.currentUser.uid) {
-              const updatedUser = {
-                ...prevUser,
-                stats: {
-                  ...prevUser.stats,
-                  ranking: currentUserInRankedList.stats.ranking
-                }
-              };
-              localStorage.setItem(`firebaseUser_${auth.currentUser.uid}`, JSON.stringify(updatedUser));
-              return updatedUser;
-            }
-            return prevUser;
-          });
-        }
-      }
-    }, (error) => {
-      console.error("Error fetching students for App.jsx:", error);
-    });
-
-    const newsCollectionRef = collection(db, 'news');
-    const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(5));
-    unsubscribeNews = onSnapshot(qNews, 
-      (querySnapshot) => {
-        const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        setAllNews(newsList);
-      }, 
-      (error) => {
-        console.error("Error fetching news for App.jsx:", error);
-        // Set empty array on error to prevent app crash
-        setAllNews([]);
-      }
-    );
-    
-    const eventsCollectionRef = collection(db, 'events');
-    const qEvents = query(eventsCollectionRef, orderBy("date", "desc"), limit(5));
-    unsubscribeEvents = onSnapshot(qEvents, 
-      (querySnapshot) => {
-        const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-        setAllEvents(eventsList);
-      }, 
-      (error) => {
-        console.error("Error fetching events for App.jsx:", error);
-        // Set empty array on error to prevent app crash
-        setAllEvents([]);
-      }
-    );
-    
     const timer = setTimeout(() => {
       if (isLoading && !currentUser) setIsLoading(false);
     }, 3500);
