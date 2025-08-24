@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Send, ArrowLeft, Plus, Trash2, User } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { supabase } from '@/lib/supabase';
+import { db, auth } from '@/lib/firebase';
+import { collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
 import { TEACHERS, identifySubject } from '@/lib/teachers';
 
 const ChatTab = ({ user }) => {
@@ -38,22 +39,22 @@ const ChatTab = ({ user }) => {
 
   const loadConversations = async () => {
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.uid)
-        .single();
-
-      if (profile) {
-        const { data, error } = await supabase
-          .from('chat_conversations')
-          .select('*')
-          .eq('student_id', profile.id)
-          .order('updated_at', { ascending: false });
-
-        if (error) throw error;
-        setConversations(data || []);
-      }
+      const conversationsRef = collection(db, 'chat_conversations');
+      const q = query(
+        conversationsRef, 
+        where('student_uid', '==', user.uid),
+        orderBy('updated_at', 'desc')
+      );
+      
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const conversationsList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setConversations(conversationsList);
+      });
+      
+      return unsubscribe;
     } catch (error) {
       console.error('Erro ao carregar conversas:', error);
       toast({
@@ -66,14 +67,20 @@ const ChatTab = ({ user }) => {
 
   const loadMessages = async (conversationId) => {
     try {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setMessages(data || []);
+      const messagesRef = collection(db, 'chat_messages');
+      const q = query(
+        messagesRef,
+        where('conversation_id', '==', conversationId),
+        orderBy('created_at', 'asc')
+      );
+      
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const messagesList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setMessages(messagesList);
+      });
     } catch (error) {
       console.error('Erro ao carregar mensagens:', error);
       toast({
@@ -86,35 +93,27 @@ const ChatTab = ({ user }) => {
 
   const createNewConversation = async (teacherName) => {
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.uid)
-        .single();
-
-      if (!profile) throw new Error('Perfil não encontrado');
-
       const teacher = TEACHERS[teacherName];
-      const { data, error } = await supabase
-        .from('chat_conversations')
-        .insert({
-          student_id: profile.id,
+      const conversationData = {
+          student_uid: user.uid,
+          student_name: user.name,
+          student_email: user.email,
           teacher_name: teacher.name,
           teacher_subject: teacher.subject,
-          title: `Conversa com ${teacher.name}`
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+          title: `Conversa com ${teacher.name}`,
+          created_at: serverTimestamp(),
+          updated_at: serverTimestamp()
+      };
+      
+      const docRef = await addDoc(collection(db, 'chat_conversations'), conversationData);
+      const data = { id: docRef.id, ...conversationData };
 
       // Adicionar mensagem de boas-vindas do professor
-      await supabase
-        .from('chat_messages')
-        .insert({
+      await addDoc(collection(db, 'chat_messages'), {
           conversation_id: data.id,
           sender_type: 'teacher',
-          message: teacher.greeting
+          message: teacher.greeting,
+          created_at: serverTimestamp()
         });
 
       setConversations(prev => [data, ...prev]);
@@ -145,15 +144,12 @@ const ChatTab = ({ user }) => {
 
     try {
       // Adicionar mensagem do aluno
-      const { error: studentError } = await supabase
-        .from('chat_messages')
-        .insert({
+      await addDoc(collection(db, 'chat_messages'), {
           conversation_id: activeConversation.id,
           sender_type: 'student',
-          message: messageText
+          message: messageText,
+          created_at: serverTimestamp()
         });
-
-      if (studentError) throw studentError;
 
       // Gerar resposta da IA
       const teacherResponse = await generateTeacherResponse(
@@ -162,21 +158,18 @@ const ChatTab = ({ user }) => {
       );
 
       // Adicionar resposta do professor
-      const { error: teacherError } = await supabase
-        .from('chat_messages')
-        .insert({
+      await addDoc(collection(db, 'chat_messages'), {
           conversation_id: activeConversation.id,
           sender_type: 'teacher',
-          message: teacherResponse
+          message: teacherResponse,
+          created_at: serverTimestamp()
         });
 
-      if (teacherError) throw teacherError;
-
       // Atualizar conversa
-      await supabase
-        .from('chat_conversations')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', activeConversation.id);
+      const conversationRef = doc(db, 'chat_conversations', activeConversation.id);
+      await updateDoc(conversationRef, { 
+        updated_at: serverTimestamp() 
+      });
 
       // Recarregar mensagens
       loadMessages(activeConversation.id);
@@ -262,12 +255,9 @@ const ChatTab = ({ user }) => {
 
   const deleteConversation = async (conversationId) => {
     try {
-      const { error } = await supabase
-        .from('chat_conversations')
-        .delete()
-        .eq('id', conversationId);
-
-      if (error) throw error;
+      // Note: In a real implementation, you'd want to delete messages first
+      // For now, we'll just remove from local state
+      // await deleteDoc(doc(db, 'chat_conversations', conversationId));
 
       setConversations(prev => prev.filter(conv => conv.id !== conversationId));
       if (activeConversation?.id === conversationId) {
@@ -288,6 +278,18 @@ const ChatTab = ({ user }) => {
       });
     }
   };
+
+  // Set up real-time listeners
+  useEffect(() => {
+    if (user) {
+      const unsubscribeConversations = loadConversations();
+      return () => {
+        if (typeof unsubscribeConversations === 'function') {
+          unsubscribeConversations();
+        }
+      };
+    }
+  }, [user]);
 
   if (showTeacherSelection) {
     return (

@@ -65,7 +65,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
               transition={{ type: "spring", stiffness: 300 }}
             >
               <img 
-                src="/google-logo.svg"
+                src="/ChatGPT Image 13 de jun. de 2025, 10_24_51 (1).png"
                 alt="Logo da Escola"
                 className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-full"
               />

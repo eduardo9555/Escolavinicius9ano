@@ -55,7 +55,7 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
         return <DashboardContent user={user} setActiveTab={setActiveTab} allStudents={allStudents} allNews={allNews} allEvents={allEvents} />;
       case 'ranking':
         console.log('Rendering RankingTab for student with allStudents:', allStudents);
-        return <RankingTab user={user} allStudents={allStudents} />;
+        return user.type === 'student' ? <RankingTab user={user} allStudents={allStudents} /> : null;
       case 'news':
         return <AdminNewsPanel user={user} isStudentView={user.type === 'student'} />;
       case 'events':

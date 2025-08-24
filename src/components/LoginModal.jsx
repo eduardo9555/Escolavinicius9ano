@@ -5,11 +5,9 @@ import { X, User, Shield, LogIn, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { auth } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { supabase } from '@/lib/supabase';
 
 const LoginModal = ({ isOpen, onClose, onLogin, type, adminEmails, authorizedStudentEmails }) => {
   const [loading, setLoading] = useState(false);
-  const [useSupabase] = useState(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 
   const handleFirebaseLoginSuccess = async (firebaseUser) => {
     const userEmailLower = firebaseUser.email.toLowerCase();
@@ -78,23 +76,9 @@ const LoginModal = ({ isOpen, onClose, onLogin, type, adminEmails, authorizedStu
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      if (useSupabase) {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: window.location.origin
-          }
-        });
-        
-        if (error) throw error;
-        
-        // O redirecionamento será tratado automaticamente
-        onClose();
-      } else {
-        const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        await handleFirebaseLoginSuccess(result.user);
-      }
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      await handleFirebaseLoginSuccess(result.user);
     } catch (error) {
       if (error.code === 'auth/popup-closed-by-user') {
         console.warn("Google login popup closed by user:", error);

@@ -22,7 +22,6 @@ import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp, onSnapshot, collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import AccessDeniedModal from '@/components/AccessDeniedModal';
 import StudentReportPage from '@/components/StudentReportPage';
-import { supabase } from '@/lib/supabase';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -36,7 +35,6 @@ function App() {
   const [allEvents, setAllEvents] = useState([]);
   const [showReportPage, setShowReportPage] = useState(false);
   const [studentForReport, setStudentForReport] = useState(null);
-  const [useSupabase, setUseSupabase] = useState(false);
 
   const adminEmails = [
     'izafantin26@gmail.com',
@@ -74,11 +72,6 @@ function App() {
   ].map(email => email.toLowerCase());
 
   useEffect(() => {
-    // Forçar uso do Firebase ao invés do Supabase
-    const shouldUseSupabase = false;
-    setUseSupabase(false);
-    
-    // Lógica original do Firebase (mantida como fallback)
     setIsLoading(true);
     
     // Declare unsubscribe functions
