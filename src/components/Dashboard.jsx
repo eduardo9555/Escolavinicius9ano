@@ -18,20 +18,15 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
 
   const commonTabsBase = [
     { id: 'dashboard', label: 'Meu Painel', icon: Home },
-    { id: 'news', label: 'Notícias', icon: Newspaper },
-    { id: 'events', label: 'Eventos', icon: CalendarDays },
   ];
 
   const studentTabs = [
     ...commonTabsBase,
     { id: 'ranking', label: 'Ranking Geral', icon: Award },
-    { id: 'chat', label: 'Perguntas', icon: MessageCircle },
   ];
   
   const adminTabsSpecific = [
     { id: 'adminStudents', label: 'Gerenciar Alunos', icon: Users },
-    { id: 'adminNews', label: 'Gerenciar Notícias', icon: FileText },
-    { id: 'adminEvents', label: 'Gerenciar Eventos', icon: CalendarDays },
     { id: 'adminRanking', label: 'Ranking Geral', icon: Award },
     { id: 'adminReports', label: 'Relatórios', icon: FileSpreadsheet },
   ];
@@ -56,18 +51,8 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
       case 'ranking':
         console.log('Rendering RankingTab for student with allStudents:', allStudents);
         return user.type === 'student' ? <RankingTab user={user} allStudents={allStudents} /> : null;
-      case 'news':
-        return <AdminNewsPanel user={user} isStudentView={user.type === 'student'} />;
-      case 'events':
-        return <AdminEventsPanel user={user} isStudentView={user.type === 'student'} />;
-      case 'chat':
-        return user.type === 'student' ? <ChatTab user={user} /> : null;
       case 'adminStudents':
         return user.type === 'admin' ? <AdminPanel /> : null;
-      case 'adminNews':
-        return user.type === 'admin' ? <AdminNewsPanel user={user} isStudentView={false} /> : null;
-      case 'adminEvents':
-         return user.type === 'admin' ? <AdminEventsPanel user={user} isStudentView={false} /> : null;
       case 'adminRanking':
         console.log('Rendering RankingTab for admin with allStudents:', allStudents);
         return user.type === 'admin' ? <RankingTab user={user} allStudents={allStudents} isAdminView={true} /> : null;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Trophy, Medal, Award, Users, Calendar, TrendingUp, BarChart3, PieChart, ThumbsUp, AlertTriangle, MessageSquare, Sparkles, ArrowRight, Newspaper, CalendarDays, BookOpen, ExternalLink, Star } from 'lucide-react';
+import { Trophy, Medal, Award, Users, Calendar, TrendingUp, BarChart3, PieChart, ThumbsUp, AlertTriangle, MessageSquare, Sparkles, ArrowRight, BookOpen, ExternalLink, Star } from 'lucide-react';
 import AdminDashboard from '@/components/AdminDashboard';
 
 const MotivationalMessage = ({ score, name }) => {
@@ -385,42 +385,6 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
           />
         </div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.7, ease: "circOut" }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6 md:mt-8"
-      >
-        <motion.div 
-          className="bg-gradient-to-br from-sky-500 to-blue-600 p-4 sm:p-6 rounded-xl shadow-xl text-white card-hover cursor-pointer"
-          whileHover={{ scale: 1.02, y: -3, boxShadow: "0px 10px 30px rgba(50,150,255,0.4)"}}
-          onClick={() => setActiveTab('news')}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-lg sm:text-xl font-bold">Últimas Notícias</h4>
-            <Newspaper className="w-6 h-6 sm:w-7 sm:h-7 opacity-80" />
-          </div>
-          <p className="text-xs sm:text-sm opacity-90 mb-3">Fique por dentro das novidades e comunicados.</p>
-          <Button variant="outline" className="bg-white/20 border-white/30 hover:bg-white/30 text-white w-full backdrop-blur-sm shadow-md text-xs sm:text-sm">
-            Ver Notícias <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
-          </Button>
-        </motion.div>
-        <motion.div 
-          className="bg-gradient-to-br from-amber-500 to-orange-600 p-4 sm:p-6 rounded-xl shadow-xl text-white card-hover cursor-pointer"
-          whileHover={{ scale: 1.02, y: -3, boxShadow: "0px 10px 30px rgba(255,150,50,0.4)"}}
-          onClick={() => setActiveTab('events')}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-lg sm:text-xl font-bold">Próximos Eventos</h4>
-            <CalendarDays className="w-6 h-6 sm:w-7 sm:h-7 opacity-80" />
-          </div>
-          <p className="text-xs sm:text-sm opacity-90 mb-3">Confira os eventos e atividades programadas.</p>
-          <Button variant="outline" className="bg-white/20 border-white/30 hover:bg-white/30 text-white w-full backdrop-blur-sm shadow-md text-xs sm:text-sm">
-            Ver Eventos <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1.5 sm:ml-2" />
-          </Button>
-        </motion.div>
-      </motion.div>
 
       <FeedbackSection />
 
