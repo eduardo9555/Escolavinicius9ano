@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Award, Trophy, Medal, Star } from 'lucide-react';
 
-const RankingTab = ({ user, allStudents }) => {
+const RankingTab = ({ user, allStudents, isAdminView = false }) => {
   // Sort students by average score
   const sortedStudents = allStudents ? [...allStudents].sort((a, b) => {
     const avgA = a.stats ? Math.round(
@@ -46,7 +46,7 @@ const RankingTab = ({ user, allStudents }) => {
       <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-xl p-6 border-2 border-emerald-200">
         <div className="flex items-center space-x-3 mb-6">
           <Users className="w-8 h-8 text-emerald-600" />
-          <h1 className="text-3xl font-bold text-emerald-800">Ranking Geral</h1>
+          <h1 className="text-3xl font-bold text-emerald-800">{isAdminView ? 'Ranking Geral - Visão Admin' : 'Ranking Geral'}</h1>
         </div>
         <p className="text-emerald-600 text-lg">
           Confira a classificação dos alunos baseada no desempenho geral
@@ -73,7 +73,12 @@ const RankingTab = ({ user, allStudents }) => {
                  (student.stats.plataformasDigitais || 0)) / 5
               ) : 0;
               
-              const isCurrentUser = student.uid === user.uid || student.email === user.email;
+              const isCurrentUser = isAdminView ? false : (
+                student.uid === user.uid || 
+                student.id === user.uid ||
+                student.email?.toLowerCase() === user.email?.toLowerCase() ||
+                student.name === user.name
+              );
 
               return (
                 <motion.div
@@ -94,7 +99,7 @@ const RankingTab = ({ user, allStudents }) => {
                     <div>
                       <h3 className={`font-semibold ${isCurrentUser ? 'text-emerald-800' : 'text-gray-800'}`}>
                         {student.name}
-                        {isCurrentUser && <span className="ml-2 text-sm text-emerald-600">(Você)</span>}
+                        {isCurrentUser && !isAdminView && <span className="ml-2 text-sm text-emerald-600">(Você)</span>}
                       </h3>
                       <p className="text-sm text-gray-600">{student.email}</p>
                     </div>

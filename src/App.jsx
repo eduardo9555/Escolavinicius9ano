@@ -275,17 +275,31 @@ function App() {
 
     const newsCollectionRef = collection(db, 'news');
     const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(5));
-    unsubscribeNews = onSnapshot(qNews, (querySnapshot) => {
-      const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-      setAllNews(newsList);
-    }, (error) => console.error("Error fetching news for App.jsx:", error));
+    unsubscribeNews = onSnapshot(qNews, 
+      (querySnapshot) => {
+        const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        setAllNews(newsList);
+      }, 
+      (error) => {
+        console.error("Error fetching news for App.jsx:", error);
+        // Set empty array on error to prevent app crash
+        setAllNews([]);
+      }
+    );
     
     const eventsCollectionRef = collection(db, 'events');
     const qEvents = query(eventsCollectionRef, orderBy("date", "desc"), limit(5));
-    unsubscribeEvents = onSnapshot(qEvents, (querySnapshot) => {
-      const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-      setAllEvents(eventsList);
-    }, (error) => console.error("Error fetching events for App.jsx:", error));
+    unsubscribeEvents = onSnapshot(qEvents, 
+      (querySnapshot) => {
+        const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        setAllEvents(eventsList);
+      }, 
+      (error) => {
+        console.error("Error fetching events for App.jsx:", error);
+        // Set empty array on error to prevent app crash
+        setAllEvents([]);
+      }
+    );
     
     const timer = setTimeout(() => {
       if (isLoading && !currentUser) setIsLoading(false);

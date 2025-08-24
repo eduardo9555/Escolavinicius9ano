@@ -202,14 +202,24 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
   useEffect(() => {
     // Encontrar dados atualizados do estudante no allStudents
     if (user.type === 'student' && allStudents && allStudents.length > 0) {
-      const updatedStudent = allStudents.find(s => 
+      console.log('DashboardContent - Looking for student:', user);
+      console.log('DashboardContent - Available students:', allStudents);
+      
+      const updatedStudent = allStudents.find(s => {
+        console.log('Comparing student:', s, 'with user:', user);
+        return (
         s.id === user.uid || 
         s.uid === user.uid ||
         s.email?.toLowerCase() === user.email?.toLowerCase()
-      );
+        );
+      });
+      
+      console.log('DashboardContent - Found student:', updatedStudent);
+      
       if (updatedStudent) {
         setStudentData(updatedStudent);
       } else {
+        console.log('DashboardContent - Student not found, using original user data');
         setStudentData(user);
       }
     } else {
