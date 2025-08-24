@@ -160,7 +160,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           >
             <div className="relative glass-effect p-6 sm:p-8 rounded-3xl shadow-2xl border-2 border-white/20">
               <motion.img 
-                src="file:///C:/Users/asist/Downloads/Copilot_20250603_204337-removebg-preview.png"
+                src="https://i.postimg.cc/RFS1mcTK/image.png"
                 alt="Mascote da escola apresentando"
                 className="w-[300px] sm:w-[380px] h-auto object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.3)] floating-animation"
                 drag
