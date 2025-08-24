@@ -124,7 +124,7 @@ const MascotPrize = ({ userName, userRanking, totalStudents }) => {
       </div>
       <div className="flex items-center space-x-2 sm:space-x-3 bg-emerald-50 p-2.5 sm:p-3.5 rounded-xl shadow-inner w-full mt-2 border border-emerald-100">
         <motion.img
-          src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/d3e82f464b6bd1fa35d02a534ff070fd.png"
+          src="https://i.postimg.cc/RFS1mcTK/image.png"
           alt="Mascote"
           className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain flex-shrink-0"
           animate={{ y: [0, -6, 0], rotate: [0, 2, -2, 0] }}
