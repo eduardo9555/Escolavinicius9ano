@@ -104,6 +104,7 @@ const AdminNewsPanel = ({ isStudentView = false }) => {
   const iconColor = isStudentView ? "text-sky-600" : "text-amber-600";
   const buttonColor = isStudentView ? "bg-sky-600 hover:bg-sky-700" : "bg-amber-600 hover:bg-amber-700";
   const ringColor = isStudentView ? "focus:ring-sky-500 focus:border-sky-500" : "focus:ring-amber-500 focus:border-amber-500";
+  const borderColor = isStudentView ? "border-sky-500" : "border-amber-500";
 
   const formatDate = (timestamp) => {
     if (!timestamp || !timestamp.toDate) return 'Data indisponível';
@@ -205,7 +206,7 @@ const AdminNewsPanel = ({ isStudentView = false }) => {
                     />
                   </div>
                 )}
-                <div className="p-5">
+                <div className={`p-5 ${isStudentView ? 'border-l-4 border-sky-500' : ''}`}>
                   <h4 className={`text-xl font-bold ${iconColor} mb-1.5`}>{item.title}</h4>
                   <div className="flex items-center space-x-4 text-xs text-gray-500 mb-3">
                     <span className="flex items-center"><UserIcon className="w-3.5 h-3.5 mr-1" /> {item.authorName || 'Secretaria'}</span>
@@ -223,7 +224,14 @@ const AdminNewsPanel = ({ isStudentView = false }) => {
                     </div>
                   )}
                    {isStudentView && (
-                     <Button variant="link" className={`p-0 h-auto text-sm ${iconColor} hover:underline`}>Ler mais</Button>
+                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                       <Button variant="link" className={`p-0 h-auto text-sm ${iconColor} hover:underline font-medium`}>
+                         Ler mais
+                       </Button>
+                       <div className="text-xs text-gray-400">
+                         📰 Notícia
+                       </div>
+                     </div>
                    )}
                 </div>
               </motion.div>

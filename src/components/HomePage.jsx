@@ -187,53 +187,149 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
 
       {(latestNews.length > 0 || latestEvents.length > 0) && (
          <motion.section 
-            className="relative z-10 py-8 sm:py-12 px-3 sm:px-4 md:px-6 bg-white/5 backdrop-blur-md"
+            className="relative z-10 py-8 sm:py-12 px-3 sm:px-4 md:px-6 bg-white/10 backdrop-blur-md border-t border-white/20"
             initial={{ opacity:0, y:50 }}
             animate={{ opacity:1, y:0 }}
             transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
           >
-            <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 sm:gap-8">
+            <div className="max-w-6xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.6 }}
+                className="text-center mb-8 sm:mb-12"
+              >
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-4">
+                  Fique por Dentro!
+                </h2>
+                <p className="text-white/80 text-sm sm:text-base md:text-lg">
+                  Confira as últimas novidades e eventos da nossa escola
+                </p>
+              </motion.div>
+              
+              <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
               {latestNews.length > 0 && (
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
-                    <Newspaper className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-3 text-sky-300"/> Últimas Notícias
-                  </h3>
-                  <div className="space-y-2 sm:space-y-3">
-                    {latestNews.map(news => (
-                      <motion.div 
-                        key={news.id} 
-                        className="bg-white/10 p-3 sm:p-4 rounded-lg shadow-md hover:bg-white/20 transition-colors border border-white/20"
-                        whileHover={{ scale: 1.02 }}
-                      >
-                        <h4 className="font-semibold text-white text-sm sm:text-base truncate">{news.title}</h4>
-                        <p className="text-xs sm:text-sm text-white/80 line-clamp-2">{news.summary}</p>
-                        <div className="text-[10px] sm:text-xs text-white/70 mt-1">{formatDate(news.createdAt)}</div>
-                      </motion.div>
-                    ))}
+                <motion.div
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                  className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl"
+                >
+                  <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+                    <div className="p-2 sm:p-2.5 bg-sky-500/20 rounded-lg">
+                      <Newspaper className="w-5 h-5 sm:w-6 sm:h-6 text-sky-300"/>
+                    </div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Últimas Notícias</h3>
                   </div>
-                </div>
-              )}
-              {latestEvents.length > 0 && (
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
-                     <CalendarDays className="w-6 h-6 sm:w-7 sm:h-7 mr-2 sm:mr-3 text-amber-300"/> Próximos Eventos
-                  </h3>
-                  <div className="space-y-2 sm:space-y-3">
-                    {latestEvents.map(event => (
-                       <motion.div 
-                        key={event.id} 
-                        className="bg-white/10 p-3 sm:p-4 rounded-lg shadow-md hover:bg-white/20 transition-colors border border-white/20"
-                        whileHover={{ scale: 1.02 }}
+                  <div className="space-y-3 sm:space-y-4">
+                    {latestNews.slice(0, 3).map((news, index) => (
+                      <motion.div 
+                        key={news.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.9 + index * 0.1, duration: 0.5 }}
+                        className="bg-white/10 p-3 sm:p-4 rounded-xl shadow-md hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/30 group cursor-pointer"
+                        whileHover={{ scale: 1.02, y: -2 }}
                       >
-                        <h4 className="font-semibold text-white text-sm sm:text-base truncate">{event.title}</h4>
-                        <p className="text-xs sm:text-sm text-white/80 truncate">{event.location}</p>
-                        <div className="text-[10px] sm:text-xs text-white/70 mt-1">
-                          {formatEventDate(event.date)} às {event.time}
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0 w-2 h-2 sm:w-3 sm:h-3 bg-sky-400 rounded-full mt-2 group-hover:bg-sky-300 transition-colors"></div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-white text-sm sm:text-base leading-tight mb-1 group-hover:text-sky-200 transition-colors">
+                              {news.title}
+                            </h4>
+                            <p className="text-xs sm:text-sm text-white/80 line-clamp-2 mb-2 leading-relaxed">
+                              {news.summary}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <div className="text-[10px] sm:text-xs text-white/60 font-medium">
+                                {formatDate(news.createdAt)}
+                              </div>
+                              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-1 transition-all" />
+                            </div>
+                          </div>
                         </div>
                       </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
+              )}
+              
+              {latestEvents.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                  className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl"
+                >
+                  <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+                    <div className="p-2 sm:p-2.5 bg-amber-500/20 rounded-lg">
+                      <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300"/>
+                    </div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Próximos Eventos</h3>
+                  </div>
+                  <div className="space-y-3 sm:space-y-4">
+                    {latestEvents.slice(0, 3).map((event, index) => (
+                      <motion.div 
+                        key={event.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.9 + index * 0.1, duration: 0.5 }}
+                        className="bg-white/10 p-3 sm:p-4 rounded-xl shadow-md hover:bg-white/20 transition-all duration-300 border border-white/10 hover:border-white/30 group cursor-pointer"
+                        whileHover={{ scale: 1.02, y: -2 }}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0 w-2 h-2 sm:w-3 sm:h-3 bg-amber-400 rounded-full mt-2 group-hover:bg-amber-300 transition-colors"></div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-white text-sm sm:text-base leading-tight mb-1 group-hover:text-amber-200 transition-colors">
+                              {event.title}
+                            </h4>
+                            <p className="text-xs sm:text-sm text-white/80 mb-2 leading-relaxed">
+                              📍 {event.location}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <div className="text-[10px] sm:text-xs text-white/60 font-medium">
+                                {formatEventDate(event.date)} às {event.time}
+                              </div>
+                              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-1 transition-all" />
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+              </div>
+              
+              {(latestNews.length > 3 || latestEvents.length > 3) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2, duration: 0.6 }}
+                  className="text-center mt-8 sm:mt-12"
+                >
+                  <p className="text-white/70 text-sm sm:text-base mb-4">
+                    Faça login para ver todas as notícias e eventos
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                    <Button
+                      onClick={() => onLogin('student')}
+                      variant="outline"
+                      className="bg-white/20 text-white hover:bg-white/30 border-white/50 hover:border-white text-sm px-6 py-2 rounded-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-300"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Entrar como Aluno
+                    </Button>
+                    <Button
+                      onClick={() => onLogin('admin')}
+                      variant="outline"
+                      className="bg-white/20 text-white hover:bg-white/30 border-white/50 hover:border-white text-sm px-6 py-2 rounded-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-300"
+                    >
+                      <Award className="w-4 h-4 mr-2" />
+                      Acesso da Secretaria
+                    </Button>
+                  </div>
+                </motion.div>
               )}
             </div>
          </motion.section>

@@ -21,6 +21,8 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
   const studentTabs = [
     ...commonTabsBase,
     { id: 'ranking', label: 'Ranking Geral', icon: Award },
+    { id: 'studentNews', label: 'Notícias', icon: FileText },
+    { id: 'studentEvents', label: 'Eventos', icon: FileText },
   ];
   
   const adminTabsSpecific = [
@@ -51,6 +53,10 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
       case 'ranking':
         console.log('Rendering RankingTab for student with allStudents:', allStudents);
         return user.type === 'student' ? <RankingTab user={user} allStudents={allStudents} /> : null;
+      case 'studentNews':
+        return user.type === 'student' ? <AdminNewsPanel isStudentView={true} /> : null;
+      case 'studentEvents':
+        return user.type === 'student' ? <AdminEventsPanel user={user} isStudentView={true} /> : null;
       case 'adminStudents':
         return user.type === 'admin' ? <AdminPanel /> : null;
       case 'adminRanking':

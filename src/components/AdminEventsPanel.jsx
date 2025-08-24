@@ -103,6 +103,7 @@ const AdminEventsPanel = ({ user, isStudentView = false }) => {
   const iconColor = isStudentView ? "text-blue-600" : "text-purple-600";
   const buttonColor = isStudentView ? "bg-blue-600 hover:bg-blue-700" : "bg-purple-600 hover:bg-purple-700";
   const ringColor = isStudentView ? "focus:ring-blue-500 focus:border-blue-500" : "focus:ring-purple-500 focus:border-purple-500";
+  const borderColor = isStudentView ? "border-blue-500" : "border-purple-500";
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Data indisponível';
@@ -205,7 +206,7 @@ const AdminEventsPanel = ({ user, isStudentView = false }) => {
                 transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
                 className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden card-hover transform hover:-translate-y-1 border border-gray-100"
               >
-                <div className={`p-5 border-l-4 ${isStudentView ? 'border-blue-500' : 'border-purple-500'}`}>
+                <div className={`p-5 border-l-4 ${borderColor}`}>
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
                     <h4 className={`text-lg font-semibold ${iconColor}`}>{event.title}</h4>
                     {!isStudentView && (
@@ -227,10 +228,15 @@ const AdminEventsPanel = ({ user, isStudentView = false }) => {
                   {event.description && <p className="text-sm text-gray-600 mt-3 pt-3 border-t border-gray-100 flex items-start"><AlignLeft className="w-4 h-4 mr-2 mt-0.5 opacity-70 flex-shrink-0" /> {event.description}</p>}
                 
                   {isStudentView && (
-                      <Button size="sm" variant="link" className={`mt-3 p-0 h-auto text-sm ${iconColor} hover:underline`}>
-                          <Info className="w-4 h-4 mr-1" />
-                          Mais detalhes
-                      </Button>
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                        <Button size="sm" variant="link" className={`p-0 h-auto text-sm ${iconColor} hover:underline font-medium`}>
+                            <Info className="w-4 h-4 mr-1" />
+                            Mais detalhes
+                        </Button>
+                        <div className="text-xs text-gray-400">
+                          📅 Evento
+                        </div>
+                      </div>
                   )}
                 </div>
               </motion.div>
