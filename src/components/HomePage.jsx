@@ -65,7 +65,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
               transition={{ type: "spring", stiffness: 300 }}
             >
               <img 
-                src="https://i.postimg.cc/1zktcP8t/image.png"
+                src="https://i.postimg.cc/gJKWXPR1/image.png"
                 alt="Logo da Escola"
                 className="w-8 h-8 sm:w-10 sm:h-10 object-contain rounded-full"
               />
