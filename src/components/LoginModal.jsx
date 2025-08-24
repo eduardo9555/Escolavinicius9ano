@@ -96,7 +96,11 @@ const LoginModal = ({ isOpen, onClose, onLogin, type, adminEmails, authorizedStu
         await handleFirebaseLoginSuccess(result.user);
       }
     } catch (error) {
-      console.error("Firebase Google login error:", error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        console.warn("Google login popup closed by user:", error);
+      } else {
+        console.error("Firebase Google login error:", error);
+      }
       let errorMessage = "Não foi possível fazer login com Google.";
       if (error.code === 'auth/popup-closed-by-user') {
         errorMessage = "Janela de login com Google fechada.";
