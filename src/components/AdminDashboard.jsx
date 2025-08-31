@@ -191,7 +191,7 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
           transition={{ delay: 0.2, duration: 0.6, type: "spring", stiffness: 120 }}
         >
           <motion.img 
-            src="https://eduardo9555-escolavi-cfpt.bolt.host"
+            src="https://i.postimg.cc/QMxh4fw4/image.png"
             alt="Mascote da Secretaria"
             className="w-24 h-auto sm:w-28 md:w-32 drop-shadow-xl floating-animation"
           />
