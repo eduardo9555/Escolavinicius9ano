@@ -207,7 +207,6 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           </motion.div>
           
           <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-          <>
           {latestNews.length > 0 ? (
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -371,4 +370,8 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           )}
         </div>
       </motion.section>
-          ) : (
+    </div>
+  );
+};
+
+export default HomePage;
