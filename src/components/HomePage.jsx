@@ -63,7 +63,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
               transition={{ type: "spring", stiffness: 300 }}
             >
               <img 
-                src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/fabd3a46ec76ba6fff9fec1d4c650677.jpg"
+                src="https://i.postimg.cc/wjwWy4WH/image.png"
                 alt="Logo da Escola"
                 className="w-10 h-10 object-contain rounded-full"
               />
