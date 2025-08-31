@@ -191,7 +191,7 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
           transition={{ delay: 0.2, duration: 0.6, type: "spring", stiffness: 120 }}
         >
           <motion.img 
-            src="/ChatGPT Image 13 de jun. de 2025, 10_24_51 (1).png"
+            src="https://eduardo9555-escolavi-cfpt.bolt.host"
             alt="Mascote da Secretaria"
             className="w-24 h-auto sm:w-28 md:w-32 drop-shadow-xl floating-animation"
           />
