@@ -9,6 +9,7 @@ import AdminNewsPanel from '@/components/AdminNewsPanel';
 import AdminEventsPanel from '@/components/AdminEventsPanel';
 import NotificationDropdown from '@/components/NotificationDropdown';
 import AdminReportsPanel from '@/components/AdminReportsPanel';
+import { CalendarDays } from 'lucide-react';
 
 const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenReport }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -22,7 +23,7 @@ const Dashboard = ({ user, onLogout, allStudents, allNews, allEvents, onOpenRepo
     ...commonTabsBase,
     { id: 'ranking', label: 'Ranking Geral', icon: Award },
     { id: 'studentNews', label: 'Notícias', icon: FileText },
-    { id: 'studentEvents', label: 'Eventos', icon: FileText },
+    { id: 'studentEvents', label: 'Eventos', icon: CalendarDays },
   ];
   
   const adminTabsSpecific = [
