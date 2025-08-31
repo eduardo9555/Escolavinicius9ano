@@ -294,9 +294,19 @@ const RankingTab = ({ user, allStudents, isAdminView = false }) => {
                       <h3 className={`font-semibold ${isCurrentUser ? 'text-emerald-800' : 'text-gray-800'}`}>
                         {student.name}
                         {isCurrentUser && !isAdminView && <span className="ml-2 text-sm text-emerald-600">(Você)</span>}
-                        {isTopThree && (
+                        {position === 1 && (
                           <span className="ml-2 text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded-full font-medium">
-                            TOP 3
+                            🥇 1º LUGAR
+                          </span>
+                        )}
+                        {position === 2 && (
+                          <span className="ml-2 text-xs px-2 py-1 bg-gray-200 text-gray-800 rounded-full font-medium">
+                            🥈 2º LUGAR
+                          </span>
+                        )}
+                        {position === 3 && (
+                          <span className="ml-2 text-xs px-2 py-1 bg-amber-200 text-amber-800 rounded-full font-medium">
+                            🥉 3º LUGAR
                           </span>
                         )}
                       </h3>
