@@ -158,7 +158,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           >
             <div className="relative glass-effect p-8 rounded-3xl shadow-2xl border-2 border-white/20">
               <motion.img 
-                src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5106ab5f-59ac-4270-81fc-d7e48fdc8ddd/d3e82f464b6bd1fa35d02a534ff070fd.png"
+                src="https://i.postimg.cc/QMxh4fw4/image.png"
                 alt="Mascote da escola apresentando"
                 className="w-[380px] h-auto object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.3)] floating-animation"
                 drag
