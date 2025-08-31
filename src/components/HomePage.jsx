@@ -207,6 +207,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           </motion.div>
           
           <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+          <>
           {latestNews.length > 0 ? (
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -371,44 +372,3 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
         </div>
       </motion.section>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-              className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 shadow-xl"
-            >
-              <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
-                <div className="p-2 sm:p-2.5 bg-amber-500/20 rounded-lg">
-                  <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300"/>
-                </div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Próximos Eventos</h3>
-              </div>
-              <div className="text-center py-8">
-                <CalendarDays className="w-12 h-12 text-white/40 mx-auto mb-3" />
-                <p className="text-white/70 text-sm">Nenhum evento agendado ainda</p>
-                <p className="text-white/50 text-xs mt-1">Aguarde novos eventos da secretaria</p>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </motion.section>
-
-
-      <motion.footer 
-        className="relative z-10 border-t border-white/20 py-6 sm:py-8"
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-white/80 text-xs sm:text-sm">
-            © {new Date().getFullYear()} Escola Estadual do Campo Vinícius de Moraes - 9º Ano. 
-            Desenvolvido com ❤️ para motivar nossos estudantes.
-          </p>
-        </div>
-      </motion.footer>
-    </div>
-  );
-};
-
-export default HomePage;
