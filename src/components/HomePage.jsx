@@ -17,12 +17,12 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
     
     // Handle Firestore timestamp
     if (timestamp && typeof timestamp.toDate === 'function') {
-      return new Date(timestamp.toDate()).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+      return new Date(timestamp.toDate()).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
     }
     
     // Handle regular date string or Date object
     try {
-      return new Date(timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+      return new Date(timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
     } catch (error) {
       return 'Data indisponível';
     }
@@ -31,7 +31,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
   const formatEventDate = (dateString) => {
     if (!dateString) return 'Data indisponível';
     try {
-      return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+      return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
     } catch (error) {
       return 'Data indisponível';
     }
@@ -238,7 +238,6 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
             {latestNews && latestNews.length > 0 ? (
               <div className="space-y-3 sm:space-y-4">
                 {latestNews.slice(0, 3).map((news, index) => {
-                  console.log('Rendering news item:', news);
                   return (
                     <motion.div 
                       key={news.id}
@@ -255,7 +254,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                             {news.title}
                           </h4>
                           <p className="text-xs sm:text-sm text-white/80 mb-2 leading-relaxed line-clamp-2">
-                            {news.summary || news.content || 'Sem descrição disponível'}
+                            {news.summary || 'Sem descrição disponível'}
                           </p>
                           <div className="flex items-center justify-between">
                             <div className="text-[10px] sm:text-xs text-white/60 font-medium">
@@ -294,7 +293,6 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
             {latestEvents && latestEvents.length > 0 ? (
               <div className="space-y-3 sm:space-y-4">
                 {latestEvents.slice(0, 3).map((event, index) => {
-                  console.log('Rendering event item:', event);
                   return (
                     <motion.div 
                       key={event.id}
@@ -335,37 +333,6 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           </motion.div>
         </div>
         
-        {((latestNews && latestNews.length > 3) || (latestEvents && latestEvents.length > 3)) && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
-            className="text-center mt-8 sm:mt-12"
-          >
-            <p className="text-white/70 text-sm sm:text-base mb-4">
-              Faça login para ver todas as notícias e eventos
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-              <Button
-                onClick={() => onLogin('student')}
-                variant="outline"
-                className="bg-white/20 text-white hover:bg-white/30 border-white/50 hover:border-white text-sm px-6 py-2 rounded-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                Entrar como Aluno
-              </Button>
-              <Button
-                onClick={() => onLogin('admin')}
-                variant="outline"
-                className="bg-white/20 text-white hover:bg-white/30 border-white/50 hover:border-white text-sm px-6 py-2 rounded-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                <Award className="w-4 h-4 mr-2" />
-                Acesso da Secretaria
-              </Button>
-            </div>
-          </motion.div>
-        )}
-        </div>
       </motion.section>
     </div>
   );

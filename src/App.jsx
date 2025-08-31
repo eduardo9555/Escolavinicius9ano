@@ -182,7 +182,7 @@ function App() {
         );
         
         const eventsCollectionRef = collection(db, 'events');
-        const qEvents = query(eventsCollectionRef, orderBy("date", "desc"), limit(10));
+        const qEvents = query(eventsCollectionRef, orderBy("createdAt", "desc"), limit(10));
         unsubscribeEvents = onSnapshot(qEvents, 
           (querySnapshot) => {
             const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
