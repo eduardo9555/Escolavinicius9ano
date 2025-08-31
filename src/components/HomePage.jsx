@@ -13,8 +13,19 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
   const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
 
   const formatDate = (timestamp) => {
-    if (!timestamp || !timestamp.toDate) return 'Data indisponível';
-    return new Date(timestamp.toDate()).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    if (!timestamp) return 'Data indisponível';
+    
+    // Handle Firestore timestamp
+    if (timestamp && typeof timestamp.toDate === 'function') {
+      return new Date(timestamp.toDate()).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    }
+    
+    // Handle regular date string or Date object
+    try {
+      return new Date(timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    } catch (error) {
+      return 'Data indisponível';
+    }
   };
 
   const formatEventDate = (dateString) => {
@@ -207,7 +218,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           </motion.div>
           
           <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-          {latestNews.length > 0 ? (
+          {latestNews && latestNews.length > 0 ? (
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -221,7 +232,9 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Últimas Notícias</h3>
               </div>
               <div className="space-y-3 sm:space-y-4">
-                {latestNews.slice(0, 3).map((news, index) => (
+                {latestNews.slice(0, 3).map((news, index) => {
+                  console.log('Rendering news item:', news);
+                  return (
                   <motion.div 
                     key={news.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -236,8 +249,8 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                         <h4 className="font-semibold text-white text-sm sm:text-base leading-tight mb-1 group-hover:text-sky-200 transition-colors">
                           {news.title}
                         </h4>
-                        <p className="text-xs sm:text-sm text-white/80 line-clamp-2 mb-2 leading-relaxed">
-                          {news.summary}
+                        <p className="text-xs sm:text-sm text-white/80 mb-2 leading-relaxed line-clamp-2">
+                          {news.summary || news.content || 'Sem descrição disponível'}
                         </p>
                         <div className="flex items-center justify-between">
                           <div className="text-[10px] sm:text-xs text-white/60 font-medium">
@@ -248,7 +261,8 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           ) : (
@@ -272,7 +286,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
             </motion.div>
           )}
           
-          {latestEvents.length > 0 ? (
+          {latestEvents && latestEvents.length > 0 ? (
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -286,7 +300,9 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Próximos Eventos</h3>
               </div>
               <div className="space-y-3 sm:space-y-4">
-                {latestEvents.slice(0, 3).map((event, index) => (
+                {latestEvents.slice(0, 3).map((event, index) => {
+                  console.log('Rendering event item:', event);
+                  return (
                   <motion.div 
                     key={event.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -301,19 +317,20 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
                         <h4 className="font-semibold text-white text-sm sm:text-base leading-tight mb-1 group-hover:text-amber-200 transition-colors">
                           {event.title}
                         </h4>
-                        <p className="text-xs sm:text-sm text-white/80 mb-2 leading-relaxed">
-                          📍 {event.location}
+                        <p className="text-xs sm:text-sm text-white/80 mb-2 leading-relaxed line-clamp-1">
+                          📍 {event.location || 'Local não informado'}
                         </p>
                         <div className="flex items-center justify-between">
                           <div className="text-[10px] sm:text-xs text-white/60 font-medium">
-                            {formatEventDate(event.date)} às {event.time}
+                            {formatEventDate(event.date)} às {event.time || 'Horário não informado'}
                           </div>
                           <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-1 transition-all" />
                         </div>
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           ) : (
@@ -338,7 +355,7 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
           )}
           </div>
           
-          {(latestNews.length > 3 || latestEvents.length > 3) && (
+          {((latestNews && latestNews.length > 3) || (latestEvents && latestEvents.length > 3)) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

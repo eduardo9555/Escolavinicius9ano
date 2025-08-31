@@ -167,10 +167,11 @@ function App() {
         });
 
         const newsCollectionRef = collection(db, 'news');
-        const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(5));
+        const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(10));
         unsubscribeNews = onSnapshot(qNews, 
           (querySnapshot) => {
             const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            console.log('News loaded in App.jsx:', newsList);
             setAllNews(newsList);
           }, 
           (error) => {
@@ -181,10 +182,11 @@ function App() {
         );
         
         const eventsCollectionRef = collection(db, 'events');
-        const qEvents = query(eventsCollectionRef, orderBy("date", "desc"), limit(5));
+        const qEvents = query(eventsCollectionRef, orderBy("createdAt", "desc"), limit(10));
         unsubscribeEvents = onSnapshot(qEvents, 
           (querySnapshot) => {
             const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            console.log('Events loaded in App.jsx:', eventsList);
             setAllEvents(eventsList);
           }, 
           (error) => {
