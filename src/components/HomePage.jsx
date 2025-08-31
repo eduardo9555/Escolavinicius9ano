@@ -365,7 +365,6 @@ const HomePage = ({ onLogin, latestNews = [], latestEvents = [] }) => {
             </div>
           </motion.div>
         )}
-      </motion.section>
         </div>
       </motion.section>
     </div>
