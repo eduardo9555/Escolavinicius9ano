@@ -44,6 +44,7 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
     'izafantin26@gmail.com': 'Diretora Iza',
     'juniedu9@gmail.com': 'Admin Juni',
     'josepsouza@escola.pr.gov.br': 'Pedagogo José',
+    'livia.allgayer@escola.pr.gov.br': 'Livia SEED',
   };
   const currentAdminName = adminUserNames[user.email.toLowerCase()] || user.name;
 
