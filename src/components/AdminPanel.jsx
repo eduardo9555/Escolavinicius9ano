@@ -153,10 +153,6 @@ const AdminPanel = () => {
       updatedAt: serverTimestamp()
     };
 
-    if (editingStudent?.uid) {
-      dataToSubmit.uid = editingStudent.uid;
-    }
-
     try {
       let activityAction = "";
       if (editingStudent) {
@@ -186,13 +182,21 @@ const AdminPanel = () => {
         }
 
         const existingData = docSnapshot.data();
+
         const mergedData = {
           ...dataToSubmit,
-          uid: existingData.uid || dataToSubmit.uid,
           createdAt: existingData.createdAt,
         };
 
-        await setDoc(studentDocRef, mergedData, { merge: true });
+        if (existingData.uid && existingData.uid !== 'undefined') {
+          mergedData.uid = existingData.uid;
+        }
+
+        const cleanedData = Object.fromEntries(
+          Object.entries(mergedData).filter(([_, value]) => value !== undefined)
+        );
+
+        await setDoc(studentDocRef, cleanedData, { merge: true });
         activityAction = `atualizou os dados do aluno ${dataToSubmit.name}`;
         toast({
           title: "Dados atualizados!",

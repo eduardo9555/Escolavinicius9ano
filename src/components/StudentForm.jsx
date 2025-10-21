@@ -146,10 +146,11 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
         ranking: initialData?.stats?.ranking || 0,
       }
     };
+
     if (initialData?.id) {
         submissionData.id = initialData.id;
     }
-    if (initialData?.uid) {
+    if (initialData?.uid && initialData.uid !== 'undefined') {
         submissionData.uid = initialData.uid;
     }
     if (initialData?.avatar) {
