@@ -110,8 +110,18 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
       setEmailError('O email deve ser institucional (@escola.pr.gov.br).');
       return;
     }
+
+    if (initialData && (!initialData.id || initialData.id.trim() === '')) {
+      toast({
+        title: "Erro ao salvar",
+        description: "ID do aluno inválido. Por favor, recarregue a página.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setEmailError('');
-    
+
     const parseNumericField = (fieldValue) => {
         const num = parseInt(fieldValue);
         return isNaN(num) || fieldValue === '' ? 0 : num;
@@ -120,7 +130,6 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
     const submissionData = {
       name: formData.name,
       email: formData.email,
-      // Avatar will be auto-generated based on name by AdminPanel or App.jsx
       stats: {
         provaParana: parseNumericField(formData.provaParana),
         saeb: parseNumericField(formData.saeb),
@@ -134,16 +143,21 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
         externasTrend: initialData?.stats?.externasTrend || 'stable',
         frequenciaTrend: initialData?.stats?.frequenciaTrend || 'stable',
         plataformasDigitaisTrend: initialData?.stats?.plataformasDigitaisTrend || 'stable',
-        ranking: initialData?.stats?.ranking || 0, 
+        ranking: initialData?.stats?.ranking || 0,
       }
     };
     if (initialData?.id) {
         submissionData.id = initialData.id;
     }
-    if (initialData?.avatar) { // Preserve existing avatar if editing
+    if (initialData?.uid) {
+        submissionData.uid = initialData.uid;
+    }
+    if (initialData?.avatar) {
         submissionData.avatar = initialData.avatar;
     }
-
+    if (initialData?.createdAt) {
+        submissionData.createdAt = initialData.createdAt;
+    }
 
     onSubmit(submissionData);
   };

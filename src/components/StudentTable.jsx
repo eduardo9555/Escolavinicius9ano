@@ -17,7 +17,7 @@ const TableHeader = ({ label, sortKey, onSort, sortIcon }) => (
   </th>
 );
 
-const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowClick, selectedStudentId }) => {
+const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowClick, selectedStudentId, isLoading }) => {
   const calculateAverage = (studentStats) => {
     if (!studentStats) return 0;
     const scores = [
@@ -103,6 +103,7 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
                     onClick={() => onEdit(student)}
                     className="text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all h-6 w-6 sm:h-8 sm:w-8 p-0"
                     title="Editar Aluno"
+                    disabled={isLoading || !student?.id}
                   >
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
@@ -112,6 +113,7 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
                     onClick={() => onDelete(student.id)}
                     className="text-red-600 hover:bg-red-100 hover:text-red-700 transition-all h-6 w-6 sm:h-8 sm:w-8 p-0"
                     title="Remover Aluno"
+                    disabled={isLoading || !student?.id}
                   >
                     <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>

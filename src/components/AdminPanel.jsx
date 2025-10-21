@@ -65,17 +65,38 @@ const AdminPanel = () => {
     setFirestoreError(null);
     const usersCollectionRef = collection(db, 'users');
     const q = query(usersCollectionRef, where("type", "==", "student"));
-    
+
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const studentsList = querySnapshot.docs.map(docSnap => {
-        const data = docSnap.data();
-        return { 
-          id: docSnap.id, 
-          ...data,
-          email: data.email?.toLowerCase() || ''
-        };
-      }).sort((a, b) => a.name.localeCompare(b.name));
-      
+      const studentsList = querySnapshot.docs
+        .map(docSnap => {
+          try {
+            const data = docSnap.data();
+            if (!data || !docSnap.id) {
+              console.warn("Documento de aluno inválido encontrado:", docSnap.id);
+              return null;
+            }
+            return {
+              id: docSnap.id,
+              ...data,
+              email: data.email?.toLowerCase() || '',
+              name: data.name || 'Sem nome',
+              stats: data.stats || {
+                provaParana: 0,
+                saeb: 0,
+                provasInternas: 0,
+                provasExternas: 0,
+                frequencia: 0,
+                plataformasDigitais: 0,
+              }
+            };
+          } catch (error) {
+            console.error("Erro ao processar documento:", docSnap.id, error);
+            return null;
+          }
+        })
+        .filter(student => student !== null)
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
       setStudents(studentsList);
       if (studentsList.length > 0 && (!selectedStudentForScores || !studentsList.find(s => s.id === selectedStudentForScores?.id))) {
         setSelectedStudentForScores(studentsList[0]);
@@ -83,14 +104,14 @@ const AdminPanel = () => {
         setSelectedStudentForScores(null);
       }
       setIsLoading(false);
-      setFirestoreError(null); // Clear error on successful fetch
+      setFirestoreError(null);
     }, (error) => {
       console.error("Erro ao buscar alunos: ", error);
-      setFirestoreError("Erro ao carregar alunos. Detalhes no console.");
-      toast({ title: "Erro ao carregar alunos", description: "Verifique o console para mais detalhes.", variant: "destructive" });
+      setFirestoreError("Erro ao carregar alunos. Por favor, recarregue a página.");
+      toast({ title: "Erro ao carregar alunos", description: "Por favor, recarregue a página e tente novamente.", variant: "destructive" });
       setIsLoading(false);
     });
-    
+
     return () => unsubscribe();
   }, []); 
   
@@ -112,7 +133,7 @@ const AdminPanel = () => {
     const dataToSubmit = {
       name: formDataFromForm.name,
       email: emailToCheck,
-      type: 'student', 
+      type: 'student',
       avatar: formDataFromForm.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${formDataFromForm.name}`,
       stats: {
         provaParana: formDataFromForm.stats.provaParana || 0,
@@ -127,10 +148,14 @@ const AdminPanel = () => {
         externasTrend: editingStudent?.stats?.externasTrend || 'stable',
         frequenciaTrend: editingStudent?.stats?.frequenciaTrend || 'stable',
         plataformasDigitaisTrend: editingStudent?.stats?.plataformasDigitaisTrend || 'stable',
-        ranking: editingStudent?.stats?.ranking || 0, // Ranking is calculated in App.jsx
+        ranking: editingStudent?.stats?.ranking || 0,
       },
       updatedAt: serverTimestamp()
     };
+
+    if (editingStudent?.uid) {
+      dataToSubmit.uid = editingStudent.uid;
+    }
 
     try {
       let activityAction = "";
@@ -150,23 +175,31 @@ const AdminPanel = () => {
         const docSnapshot = await getDoc(studentDocRef);
         if (!docSnapshot.exists()) {
           toast({
-            title: "Erro ao atualizar",
-            description: "O documento do aluno não existe no banco de dados. Contate o suporte.",
+            title: "Aluno não encontrado",
+            description: "Este aluno não existe mais no banco de dados. Por favor, recarregue a página.",
             variant: "destructive",
           });
-          console.error(`Documento não encontrado: users/${editingStudent.id}`, editingStudent);
+          console.error(`Documento não encontrado: users/${editingStudent.id}`);
+          resetForm();
           setIsLoading(false);
           return;
         }
 
-        await setDoc(studentDocRef, dataToSubmit, { merge: true });
+        const existingData = docSnapshot.data();
+        const mergedData = {
+          ...dataToSubmit,
+          uid: existingData.uid || dataToSubmit.uid,
+          createdAt: existingData.createdAt,
+        };
+
+        await setDoc(studentDocRef, mergedData, { merge: true });
         activityAction = `atualizou os dados do aluno ${dataToSubmit.name}`;
         toast({
           title: "Dados atualizados!",
-          description: `Os dados de ${dataToSubmit.name} foram atualizados.`,
+          description: `Os dados de ${dataToSubmit.name} foram atualizados com sucesso.`,
         });
         if (selectedStudentForScores && selectedStudentForScores.id === editingStudent.id) {
-          setSelectedStudentForScores(prev => ({ ...prev, ...dataToSubmit, stats: { ...prev.stats, ...dataToSubmit.stats } }));
+          setSelectedStudentForScores(prev => ({ ...prev, ...mergedData }));
         }
       } else {
         const docRef = await addDoc(collection(db, 'users'), { ...dataToSubmit, createdAt: serverTimestamp() });
@@ -207,10 +240,49 @@ const AdminPanel = () => {
     setShowForm(false);
   };
 
-  const handleEdit = (student) => {
-    setEditingStudent(student);
-    setShowForm(true);
-    setSelectedStudentForScores(student);
+  const handleEdit = async (student) => {
+    if (!student?.id) {
+      toast({
+        title: "Erro ao editar",
+        description: "O aluno selecionado não possui um ID válido. Tente recarregar a página.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const studentDocRef = doc(db, 'users', student.id);
+      const docSnapshot = await getDoc(studentDocRef);
+
+      if (!docSnapshot.exists()) {
+        toast({
+          title: "Aluno não encontrado",
+          description: "Este aluno não existe mais no banco de dados. A lista será atualizada.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const currentData = docSnapshot.data();
+      const studentWithCurrentData = {
+        id: student.id,
+        ...currentData,
+        stats: {
+          ...currentData.stats,
+        }
+      };
+
+      setEditingStudent(studentWithCurrentData);
+      setShowForm(true);
+      setSelectedStudentForScores(studentWithCurrentData);
+    } catch (error) {
+      console.error("Erro ao verificar aluno:", error);
+      toast({
+        title: "Erro ao carregar dados",
+        description: "Não foi possível carregar os dados do aluno. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = async (id) => {
