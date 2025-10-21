@@ -73,10 +73,39 @@ function App() {
 
   useEffect(() => {
     setIsLoading(true);
-    
+
     // Declare unsubscribe functions
     let unsubscribeStudents, unsubscribeNews, unsubscribeEvents;
-    
+
+    // Set up news and events listeners immediately (before authentication)
+    const newsCollectionRef = collection(db, 'news');
+    const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(10));
+    unsubscribeNews = onSnapshot(qNews,
+      (querySnapshot) => {
+        const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        console.log('News loaded in App.jsx:', newsList);
+        setAllNews(newsList);
+      },
+      (error) => {
+        console.error("Error fetching news for App.jsx:", error);
+        setAllNews([]);
+      }
+    );
+
+    const eventsCollectionRef = collection(db, 'events');
+    const qEvents = query(eventsCollectionRef, orderBy("createdAt", "desc"), limit(10));
+    unsubscribeEvents = onSnapshot(qEvents,
+      (querySnapshot) => {
+        const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        console.log('Events loaded in App.jsx:', eventsList);
+        setAllEvents(eventsList);
+      },
+      (error) => {
+        console.error("Error fetching events for App.jsx:", error);
+        setAllEvents([]);
+      }
+    );
+
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         const userEmailLower = authUser.email.toLowerCase();
@@ -91,7 +120,7 @@ function App() {
           return;
         }
 
-        // Set up Firestore listeners only when user is authenticated
+        // Set up students listener when user is authenticated
         const studentsCollectionRef = collection(db, 'users');
         const qStudents = query(studentsCollectionRef, where("type", "==", "student"));
         unsubscribeStudents = onSnapshot(qStudents, (querySnapshot) => {
@@ -165,36 +194,6 @@ function App() {
         }, (error) => {
           console.error("Error fetching students for App.jsx:", error);
         });
-
-        const newsCollectionRef = collection(db, 'news');
-        const qNews = query(newsCollectionRef, orderBy("createdAt", "desc"), limit(10));
-        unsubscribeNews = onSnapshot(qNews, 
-          (querySnapshot) => {
-            const newsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-            console.log('News loaded in App.jsx:', newsList);
-            setAllNews(newsList);
-          }, 
-          (error) => {
-            console.error("Error fetching news for App.jsx:", error);
-            // Set empty array on error to prevent app crash
-            setAllNews([]);
-          }
-        );
-        
-        const eventsCollectionRef = collection(db, 'events');
-        const qEvents = query(eventsCollectionRef, orderBy("createdAt", "desc"), limit(10));
-        unsubscribeEvents = onSnapshot(qEvents, 
-          (querySnapshot) => {
-            const eventsList = querySnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-            console.log('Events loaded in App.jsx:', eventsList);
-            setAllEvents(eventsList);
-          }, 
-          (error) => {
-            console.error("Error fetching events for App.jsx:", error);
-            // Set empty array on error to prevent app crash
-            setAllEvents([]);
-          }
-        );
 
         const userDocRef = doc(db, 'users', authUser.uid);
         const unsubscribeSnapshot = onSnapshot(userDocRef, (docSnap) => {
@@ -288,16 +287,12 @@ function App() {
         });
         return () => unsubscribeSnapshot();
       } else {
-        // Clean up Firestore listeners when user logs out
+        // Clean up only student listener when user logs out
         unsubscribeStudents?.();
-        unsubscribeNews?.();
-        unsubscribeEvents?.();
-        
-        // Reset data arrays
+
+        // Reset only students array (keep news and events for homepage)
         setAllStudents([]);
-        setAllNews([]);
-        setAllEvents([]);
-        
+
         setCurrentUser(null);
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('firebaseUser_')) {
