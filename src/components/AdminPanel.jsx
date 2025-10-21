@@ -6,7 +6,7 @@ import { toast } from '@/components/ui/use-toast';
 import StudentForm from '@/components/StudentForm';
 import StudentTable from '@/components/StudentTable';
 import { db, auth } from '@/lib/firebase';
-import { collection, onSnapshot, updateDoc, deleteDoc, doc, query, where, orderBy, serverTimestamp, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, updateDoc, deleteDoc, doc, query, where, orderBy, serverTimestamp, addDoc, setDoc, getDoc } from "firebase/firestore";
 
 const ScoreCard = ({ label, value, icon, color, trend }) => {
   let TrendIcon;
@@ -135,8 +135,31 @@ const AdminPanel = () => {
     try {
       let activityAction = "";
       if (editingStudent) {
+        if (!editingStudent.id || editingStudent.id.trim() === '') {
+          toast({
+            title: "Erro ao atualizar",
+            description: "O ID do aluno está inválido. Por favor, recarregue a página e tente novamente.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
         const studentDocRef = doc(db, 'users', editingStudent.id);
-        await updateDoc(studentDocRef, dataToSubmit);
+
+        const docSnapshot = await getDoc(studentDocRef);
+        if (!docSnapshot.exists()) {
+          toast({
+            title: "Erro ao atualizar",
+            description: "O documento do aluno não existe no banco de dados. Contate o suporte.",
+            variant: "destructive",
+          });
+          console.error(`Documento não encontrado: users/${editingStudent.id}`, editingStudent);
+          setIsLoading(false);
+          return;
+        }
+
+        await setDoc(studentDocRef, dataToSubmit, { merge: true });
         activityAction = `atualizou os dados do aluno ${dataToSubmit.name}`;
         toast({
           title: "Dados atualizados!",
