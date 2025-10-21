@@ -240,20 +240,18 @@ const DashboardContent = ({ user, setActiveTab, allStudents, allNews, allEvents 
   }
   
   const averageScore = studentData?.stats ? Math.round(
-    ( (studentData.stats.provaParana || 0) + 
-      (studentData.stats.saeb || 0) + 
-      (studentData.stats.provasInternas || 0) + 
-      (studentData.stats.provasExternas || 0) +
-      (studentData.stats.plataformasDigitais || 0)
-    ) / 5
+    ( (studentData.stats.provaParana || 0) +
+      (studentData.stats.saeb || 0) +
+      (studentData.stats.provasInternas || 0) +
+      (studentData.stats.provasExternas || 0)
+    ) / 4
   ) : 0;
 
   const performanceItems = [
-    { label: 'Rec.Ap.Matemática', value: studentData?.stats?.provasExternas || 0, color: 'bg-gradient-to-r from-purple-500 to-indigo-600', icon: <BookOpen /> },
-    { label: 'Rec.Ap.Português', value: studentData?.stats?.provasInternas || 0, color: 'bg-gradient-to-r from-sky-500 to-blue-600', icon: <Award /> },
+    { label: 'Simulado Recomp. Matemática', value: studentData?.stats?.provasExternas || 0, color: 'bg-gradient-to-r from-purple-500 to-indigo-600', icon: <BookOpen /> },
+    { label: 'Simulado Recomp. Português', value: studentData?.stats?.provasInternas || 0, color: 'bg-gradient-to-r from-sky-500 to-blue-600', icon: <Award /> },
     { label: 'Prova Paraná', value: studentData?.stats?.provaParana || 0, color: 'bg-gradient-to-r from-teal-500 to-cyan-600', icon: <Medal /> },
-    { label: 'Prova Acerta Brasil', value: studentData?.stats?.saeb || 0, color: 'bg-gradient-to-r from-emerald-500 to-green-600', icon: <Trophy /> },
-    { label: 'Plataformas Digitais', value: studentData?.stats?.plataformasDigitais || 0, color: 'bg-gradient-to-r from-amber-500 to-orange-600', icon: <PieChart /> }
+    { label: 'Prova Acerta Brasil', value: studentData?.stats?.saeb || 0, color: 'bg-gradient-to-r from-emerald-500 to-green-600', icon: <Trophy /> }
   ];
 
   return (

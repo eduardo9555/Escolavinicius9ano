@@ -75,8 +75,8 @@ const AdminDashboard = ({ user, setActiveTab, allStudents }) => {
     // Calculate averages and find top student
     const studentsWithAverages = studentsList.map(student => {
       if (student.stats) {
-        const { provaParana = 0, saeb = 0, provasInternas = 0, provasExternas = 0, plataformasDigitais = 0 } = student.stats;
-        const scores = [provaParana, saeb, provasInternas, provasExternas, plataformasDigitais];
+        const { provaParana = 0, saeb = 0, provasInternas = 0, provasExternas = 0 } = student.stats;
+        const scores = [provaParana, saeb, provasInternas, provasExternas];
         const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
         const studentAverage = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
         

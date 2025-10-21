@@ -86,7 +86,6 @@ const AdminPanel = () => {
                 provasInternas: 0,
                 provasExternas: 0,
                 frequencia: 0,
-                plataformasDigitais: 0,
               }
             };
           } catch (error) {
@@ -141,13 +140,11 @@ const AdminPanel = () => {
         provasInternas: formDataFromForm.stats.provasInternas || 0,
         provasExternas: formDataFromForm.stats.provasExternas || 0,
         frequencia: formDataFromForm.stats.frequencia || 0,
-        plataformasDigitais: formDataFromForm.stats.plataformasDigitais || 0,
         provaParanaTrend: editingStudent?.stats?.provaParanaTrend || 'stable',
         saebTrend: editingStudent?.stats?.saebTrend || 'stable',
         internasTrend: editingStudent?.stats?.internasTrend || 'stable',
         externasTrend: editingStudent?.stats?.externasTrend || 'stable',
         frequenciaTrend: editingStudent?.stats?.frequenciaTrend || 'stable',
-        plataformasDigitaisTrend: editingStudent?.stats?.plataformasDigitaisTrend || 'stable',
         ranking: editingStudent?.stats?.ranking || 0,
       },
       updatedAt: serverTimestamp()
@@ -433,10 +430,9 @@ const AdminPanel = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <ScoreCard label="Prova Paraná" value={selectedStudentForScores.stats?.provaParana} icon={<BarChartHorizontal />} color="border-blue-500" trend={selectedStudentForScores.stats?.provaParanaTrend} />
             <ScoreCard label="Prova Acerta Brasil" value={selectedStudentForScores.stats?.saeb} icon={<BarChartHorizontal />} color="border-green-500" trend={selectedStudentForScores.stats?.saebTrend} />
-            <ScoreCard label="Rec.Ap.Português" value={selectedStudentForScores.stats?.provasInternas} icon={<BarChartHorizontal />} color="border-yellow-500" trend={selectedStudentForScores.stats?.internasTrend} />
-            <ScoreCard label="Rec.Ap.Matemática" value={selectedStudentForScores.stats?.provasExternas} icon={<BarChartHorizontal />} color="border-purple-500" trend={selectedStudentForScores.stats?.externasTrend} />
+            <ScoreCard label="Simulado Recomp. Português" value={selectedStudentForScores.stats?.provasInternas} icon={<BarChartHorizontal />} color="border-yellow-500" trend={selectedStudentForScores.stats?.internasTrend} />
+            <ScoreCard label="Simulado Recomp. Matemática" value={selectedStudentForScores.stats?.provasExternas} icon={<BarChartHorizontal />} color="border-purple-500" trend={selectedStudentForScores.stats?.externasTrend} />
             <ScoreCard label="Frequência" value={selectedStudentForScores.stats?.frequencia} icon={<Users />} color="border-pink-500" trend={selectedStudentForScores.stats?.frequenciaTrend} />
-            <ScoreCard label="Plataformas Digitais" value={selectedStudentForScores.stats?.plataformasDigitais} icon={<PieChart />} color="border-orange-500" trend={selectedStudentForScores.stats?.plataformasDigitaisTrend} />
           </div>
         </motion.div>
       )}

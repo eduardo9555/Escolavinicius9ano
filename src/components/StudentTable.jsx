@@ -21,11 +21,10 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
   const calculateAverage = (studentStats) => {
     if (!studentStats) return 0;
     const scores = [
-        studentStats.provaParana, 
-        studentStats.saeb, 
-        studentStats.provasInternas, 
-        studentStats.provasExternas,
-        studentStats.plataformasDigitais
+        studentStats.provaParana,
+        studentStats.saeb,
+        studentStats.provasInternas,
+        studentStats.provasExternas
     ];
     const validScores = scores.filter(score => typeof score === 'number');
     const sum = validScores.reduce((acc, score) => acc + score, 0);
@@ -41,10 +40,9 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
             <TableHeader label="Aluno" sortKey="name" onSort={onSort} sortIcon={getSortIcon('name')} />
             <TableHeader label="P. Paraná" sortKey="provaParana" onSort={onSort} sortIcon={getSortIcon('provaParana')} />
             <TableHeader label="P. Acerta Brasil" sortKey="saeb" onSort={onSort} sortIcon={getSortIcon('saeb')} />
-            <TableHeader label="Rec.Ap.Port." sortKey="provasInternas" onSort={onSort} sortIcon={getSortIcon('provasInternas')} />
-            <TableHeader label="Rec.Ap.Mat." sortKey="provasExternas" onSort={onSort} sortIcon={getSortIcon('provasExternas')} />
+            <TableHeader label="Simulado Recomp. Português" sortKey="provasInternas" onSort={onSort} sortIcon={getSortIcon('provasInternas')} />
+            <TableHeader label="Simulado Recomp. Matemática" sortKey="provasExternas" onSort={onSort} sortIcon={getSortIcon('provasExternas')} />
             <TableHeader label="Frequência" sortKey="frequencia" onSort={onSort} sortIcon={getSortIcon('frequencia')} />
-            <TableHeader label="Plataformas" sortKey="plataformasDigitais" onSort={onSort} sortIcon={getSortIcon('plataformasDigitais')} />
             <th className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-left text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Média</th>
             <th className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-left text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
@@ -74,7 +72,7 @@ const StudentTable = ({ students, onEdit, onDelete, onSort, getSortIcon, onRowCl
                     </div>
                 </div>
               </td>
-              {[studentStats.provaParana, studentStats.saeb, studentStats.provasInternas, studentStats.provasExternas, studentStats.frequencia, studentStats.plataformasDigitais].map((score, i) => {
+              {[studentStats.provaParana, studentStats.saeb, studentStats.provasInternas, studentStats.provasExternas, studentStats.frequencia].map((score, i) => {
                 const displayScore = score === null || typeof score === 'undefined' ? 0 : score;
                 return (
                 <td key={i} className="px-2 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap cursor-pointer" onClick={() => onRowClick(student)}>

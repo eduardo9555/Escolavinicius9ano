@@ -46,11 +46,10 @@ const PodiumStep = ({ student, position, delay }) => {
 
   const config = getPositionConfig(position);
   const averageScore = student.stats ? Math.round(
-    ((student.stats.provaParana || 0) + 
-     (student.stats.saeb || 0) + 
-     (student.stats.provasInternas || 0) + 
-     (student.stats.provasExternas || 0) +
-     (student.stats.plataformasDigitais || 0)) / 5
+    ((student.stats.provaParana || 0) +
+     (student.stats.saeb || 0) +
+     (student.stats.provasInternas || 0) +
+     (student.stats.provasExternas || 0)) / 4
   ) : 0;
 
   return (

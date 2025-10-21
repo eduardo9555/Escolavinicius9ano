@@ -38,7 +38,6 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
           stats.saeb || 0,
           stats.provasInternas || 0,
           stats.provasExternas || 0,
-          stats.plataformasDigitais || 0,
         ];
         const validScores = scores.filter(s => typeof s === 'number' && !isNaN(s));
         const average = validScores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / validScores.length : 0;
@@ -82,9 +81,8 @@ const AdminReportsPanel = ({ allStudents = [], allNews = [], allEvents = [] }) =
       const subjectAverages = {
         'Prova Paraná': Math.round(allStudents.reduce((sum, s) => sum + (s.stats?.provaParana || 0), 0) / totalStudents),
         'Prova Acerta Brasil': Math.round(allStudents.reduce((sum, s) => sum + (s.stats?.saeb || 0), 0) / totalStudents),
-        'Rec.Ap.Português': Math.round(allStudents.reduce((sum, s) => sum + (s.stats?.provasInternas || 0), 0) / totalStudents),
-        'Rec.Ap.Matemática': Math.round(allStudents.reduce((sum, s) => sum + (s.stats?.provasExternas || 0), 0) / totalStudents),
-        'Plataformas Digitais': Math.round(allStudents.reduce((sum, s) => sum + (s.stats?.plataformasDigitais || 0), 0) / totalStudents),
+        'Simulado Recomp. Português': Math.round(allStudents.reduce((sum, s) => sum + (s.stats?.provasInternas || 0), 0) / totalStudents),
+        'Simulado Recomp. Matemática': Math.round(allStudents.reduce((sum, s) => sum + (s.stats?.provasExternas || 0), 0) / totalStudents),
       };
       
       setReportData({

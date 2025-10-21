@@ -35,7 +35,6 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
     provasInternas: '',
     provasExternas: '',
     frequencia: '',
-    plataformasDigitais: '',
   });
   const [emailError, setEmailError] = useState('');
 
@@ -49,7 +48,6 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
         provasInternas: initialData.stats?.provasInternas === 0 ? '' : (initialData.stats?.provasInternas?.toString() || ''),
         provasExternas: initialData.stats?.provasExternas === 0 ? '' : (initialData.stats?.provasExternas?.toString() || ''),
         frequencia: initialData.stats?.frequencia === 0 ? '' : (initialData.stats?.frequencia?.toString() || ''),
-        plataformasDigitais: initialData.stats?.plataformasDigitais === 0 ? '' : (initialData.stats?.plataformasDigitais?.toString() || ''),
       });
     } else {
       setFormData({
@@ -60,7 +58,6 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
         provasInternas: '',
         provasExternas: '',
         frequencia: '',
-        plataformasDigitais: '',
       });
     }
     setEmailError('');
@@ -136,13 +133,11 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
         provasInternas: parseNumericField(formData.provasInternas),
         provasExternas: parseNumericField(formData.provasExternas),
         frequencia: parseNumericField(formData.frequencia),
-        plataformasDigitais: parseNumericField(formData.plataformasDigitais),
         provaParanaTrend: initialData?.stats?.provaParanaTrend || 'stable',
         saebTrend: initialData?.stats?.saebTrend || 'stable',
         internasTrend: initialData?.stats?.internasTrend || 'stable',
         externasTrend: initialData?.stats?.externasTrend || 'stable',
         frequenciaTrend: initialData?.stats?.frequenciaTrend || 'stable',
-        plataformasDigitaisTrend: initialData?.stats?.plataformasDigitaisTrend || 'stable',
         ranking: initialData?.stats?.ranking || 0,
       }
     };
@@ -208,10 +203,9 @@ const StudentForm = ({ initialData, onSubmit, onCancel, isLoading }) => {
                 
         <InputField label="Prova Paraná (%)" id="provaParana" type="number" min="0" max="100" value={formData.provaParana} onChange={handleChange} icon={<Percent />} />
         <InputField label="Prova Acerta Brasil (%)" id="saeb" type="number" min="0" max="100" value={formData.saeb} onChange={handleChange} icon={<Percent />} />
-        <InputField label="Rec.Ap.Português (%)" id="provasInternas" type="number" min="0" max="100" value={formData.provasInternas} onChange={handleChange} icon={<Percent />} />
-        <InputField label="Rec.Ap.Matemática (%)" id="provasExternas" type="number" min="0" max="100" value={formData.provasExternas} onChange={handleChange} icon={<Percent />} />
+        <InputField label="Simulado Recomp. Português (%)" id="provasInternas" type="number" min="0" max="100" value={formData.provasInternas} onChange={handleChange} icon={<Percent />} />
+        <InputField label="Simulado Recomp. Matemática (%)" id="provasExternas" type="number" min="0" max="100" value={formData.provasExternas} onChange={handleChange} icon={<Percent />} />
         <InputField label="Frequência (%)" id="frequencia" type="number" min="0" max="100" value={formData.frequencia} onChange={handleChange} icon={<BarChart />} />
-        <InputField label="Plataformas Digitais (%)" id="plataformasDigitais" type="number" min="0" max="100" value={formData.plataformasDigitais} onChange={handleChange} icon={<Activity />} />
         
         <div className="md:col-span-2 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4 sm:pt-5 mt-2">
           <Button type="button" variant="outline" onClick={onCancel} className="w-full sm:w-auto shadow-sm hover:bg-gray-100 px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm" disabled={isLoading}>

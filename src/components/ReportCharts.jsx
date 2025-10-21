@@ -139,9 +139,8 @@ const ReportCharts = ({ students, isLoading }) => {
   const subjectAverages = {
     'Prova Paraná': students.reduce((sum, s) => sum + (s.stats?.provaParana || 0), 0) / (students.length || 1),
     'Prova Acerta Brasil': students.reduce((sum, s) => sum + (s.stats?.saeb || 0), 0) / (students.length || 1),
-    'Rec.Ap.Português': students.reduce((sum, s) => sum + (s.stats?.provasInternas || 0), 0) / (students.length || 1),
-    'Rec.Ap.Matemática': students.reduce((sum, s) => sum + (s.stats?.provasExternas || 0), 0) / (students.length || 1),
-    'Plataformas Digitais': students.reduce((sum, s) => sum + (s.stats?.plataformasDigitais || 0), 0) / (students.length || 1),
+    'Simulado Recomp. Português': students.reduce((sum, s) => sum + (s.stats?.provasInternas || 0), 0) / (students.length || 1),
+    'Simulado Recomp. Matemática': students.reduce((sum, s) => sum + (s.stats?.provasExternas || 0), 0) / (students.length || 1),
   };
 
   const pieChartData = {
